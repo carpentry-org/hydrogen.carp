@@ -5,8 +5,8 @@
 A simple wrapper around [libhydrogen](https://github.com/jedisct1/libhydrogen)
 for Carp.
 
-Currently only random number generation, hashing, and key derivation is
-supported.
+Currently only random number generation, hashing, secret key encryption and key
+derivation is supported.
 
 ```clojure
 (load "git@github.com:carpentry-org/hydrogen.carp.git@master")
@@ -28,9 +28,10 @@ supported.
 
 ## Usage
 
-This is an early WIP. The functions in the hashing, key derivation, and random
-modules should work, though. If you want to try the library out, you should be
-able to get it by adding the following line to your program:
+This is an early WIP. The functions in the hashing, key derivation, secret key
+encryption and random modules should work, though. If you want to try the
+library out, you should be able to get it by adding the following line to your
+program:
 
 ```clojure
 (load "git@github.com:carpentry-org/hydrogen.carp.git@master")

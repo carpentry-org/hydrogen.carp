@@ -27,6 +27,12 @@ HydroBuf Hydro_buf(String* s) {
   return res;
 }
 
+String Hydro_unbuf(HydroBuf* s) {
+  String res = malloc(s->length);
+  memcpy(res, s->buf, s->length);
+  return res;
+}
+
 String HydroBuf_str(HydroBuf* buf) {
   char* res = malloc(buf->length*2+1);
   for (int i = 0; i < buf->length; i++) {

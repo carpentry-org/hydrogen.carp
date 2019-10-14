@@ -18,6 +18,7 @@
   (register init (Fn [] ()) "hydro_init")
   (register allocate (Fn [Int] HydroBuf))
   (register buf (Fn [(Ref String)] HydroBuf))
+  (register unbuf (Fn [(Ref HydroBuf)] String))
 
   (defn context [s]
     (do
@@ -104,4 +105,45 @@
       (HydroBuf.raw &subkey) (HydroBuf.length &subkey) id ctx (HydroBuf.raw key)
     )
   )
+)
+
+(defmodule HydroSecretBox
+  (register context-bytes Int "hydro_secretbox_CONTEXTBYTES")
+  (register key-bytes Int "hydro_secretbox_KEYBYTES")
+  (register header-bytes Int "hydro_secretbox_HEADERBYTES")
+  (register probe-bytes Int "hydro_secretbox_PROBEBYTES")
+
+  (register keygen- (Fn [HydroBufRaw] ()) "hydro_secretbox_keygen")
+  (defn keygen []
+    (let-do [k (Hydro.allocate key-bytes)]
+      (keygen- (HydroBuf.raw &k))
+      k))
+
+  ; TODO propagate error
+  (register encrypt-
+            (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
+            "hydro_secretbox_encrypt")
+  (defn encrypt [m id ctx key]
+    (let-do [c (Hydro.allocate (+ (HydroBuf.length m) header-bytes))]
+      (ignore
+        (encrypt-
+          (HydroBuf.raw &c) (HydroBuf.raw m) (HydroBuf.length m) id
+          ctx (HydroBuf.raw key)
+        )
+      )
+      c))
+
+  ; TODO propagate error
+  (register decrypt-
+            (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
+            "hydro_secretbox_decrypt")
+  (defn decrypt [c id ctx key]
+    (let-do [m (Hydro.allocate (- (HydroBuf.length c) header-bytes))]
+      (ignore
+        (decrypt-
+          (HydroBuf.raw &m) (HydroBuf.raw c) (HydroBuf.length c) id
+          ctx (HydroBuf.raw key)
+        )
+      )
+      m))
 )
