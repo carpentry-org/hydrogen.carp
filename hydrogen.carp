@@ -1,6 +1,6 @@
-(relative-include "hydrogenbuf.h")
+(relative-include "./hydrogenbuf.h")
 
-(add-cflag "libhydrogen/hydrogen.c")
+(add-cflag (Dynamic.String.join [(Dynamic.String.directory "./") "/libhydrogen/hydrogen.c"]))
 
 (register-type HydroBuf)
 (register-type HydroBufRaw)
