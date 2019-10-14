@@ -1,0 +1,16 @@
+(load "hydrogen.carp")
+
+(def CONTEXT (Hydro.context "Examples"))
+(def MSG (Hydro.buf "Arbitrary data to hash"))
+(def MSG2 (Hydro.buf "extra data"))
+
+(defn main []
+   (let-do [hash (Hydro.allocate HydroHash.bytes)
+            key (HydroHash.keygen)
+            state (HydroHash.state)]
+      (ignore (HydroHash.init &state CONTEXT &key))
+      (ignore (HydroHash.update &state &MSG))
+      (ignore (HydroHash.update &state &MSG2))
+      (ignore (HydroHash.final &state &hash))
+      (println* &hash)))
+

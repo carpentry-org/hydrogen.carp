@@ -1,0 +1,16 @@
+(load "hydrogen.carp")
+
+(defn main []
+  (do
+    (println* &(HydroRandom.u32))
+    (println* &(HydroRandom.buf 16))
+    (println* &(HydroRandom.buf 0))
+    (println* &(HydroRandom.uniform 100))
+    (HydroRandom.ratchet)
+    (HydroRandom.reseed)
+    (let-do [b (Hydro.allocate 16)
+             seed (Hydro.buf &(String.allocate HydroRandom.seed-bytes \x))]
+      (HydroRandom.buf-deterministic &b &seed)
+      (println* &b))
+  )
+)

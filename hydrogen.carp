@@ -1,0 +1,83 @@
+(relative-include "hydrogenbuf.h")
+
+(add-cflag "libhydrogen/hydrogen.c")
+
+(register-type HydroBuf)
+(register-type HydroBufRaw)
+
+(defmodule HydroBuf
+  (register str (Fn [(Ref HydroBuf)] String))
+  (register array (Fn [(Ref HydroBuf)] (Array Char)))
+  (register length (Fn [(Ref HydroBuf)] Int))
+  (register raw (Fn [(Ref HydroBuf)] HydroBufRaw))
+)
+
+(defmodule Hydro
+  (register init (Fn [] ()) "hydro_init")
+  (register allocate (Fn [Int] HydroBuf))
+  (register buf (Fn [(Ref String)] HydroBuf))
+
+  (defn context [s]
+    (do
+      (assert (= (length s) 8))
+      (cstr s)))
+)
+
+(Hydro.init)
+
+(defmodule HydroRandom
+  (register seed-bytes Int "hydro_random_SEEDBYTES")
+
+  (register u32 (Fn [] Int) "hydro_random_u32")
+  (register uniform (Fn [Int] Int) "hydro_random_uniform")
+  (register buf- (Fn [HydroBufRaw Int] ()) "hydro_random_buf")
+  (defn buf [n]
+    (let-do [b (Hydro.allocate n)]
+      (buf- (HydroBuf.raw &b) n)
+      b))
+
+  (register ratchet (Fn [] ()) "hydro_random_ratchet")
+  (register reseed (Fn [] ()) "hydro_random_reseed")
+  (register buf-deterministic- (Fn [HydroBufRaw Int HydroBufRaw] ())
+            "hydro_random_buf_deterministic")
+  (defn buf-deterministic [buf bytes]
+    (buf-deterministic-
+      (HydroBuf.raw buf) (HydroBuf.length buf) (HydroBuf.raw bytes)))
+)
+
+(defmodule HydroHash
+  (register key-bytes Int "hydro_hash_KEYBYTES")
+  (register bytes Int "hydro_hash_BYTES")
+  (register bytes-max Int "hydro_hash_BYTES_MAX")
+  (register bytes-min Int "hydro_hash_BYTES_MIN")
+  (register context-bytes Int "hydro_hash_CONTEXTBYTES")
+
+  (register-type HydroHashState)
+  (register state (Fn [] HydroHashState))
+
+  (register keygen- (Fn [HydroBufRaw] ()) "hydro_hash_keygen")
+  (defn keygen []
+    (let-do [k (Hydro.allocate key-bytes)]
+      (keygen- (HydroBuf.raw &k))
+      k))
+
+  (register init- (Fn [(Ref HydroHashState) key bytes] Int)
+            "hydro_hash_init")
+  (defn init [s ctx k] (init- s ctx (HydroBuf.raw k)))
+
+  (register update- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
+            "hydro_hash_update")
+  (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
+
+  (register final- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
+            "hydro_hash_final")
+  (defn final [s buf] (final- s (HydroBuf.raw buf) (HydroBuf.length buf)))
+
+  (register gen-
+            (Fn [HydroBufRaw Int HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
+            "hydro_hash_hash")
+  (defn gen [hash msg ctx key]
+    (gen-
+      (HydroBuf.raw hash) (HydroBuf.length hash) (HydroBuf.raw msg)
+      (HydroBuf.length msg) ctx (HydroBuf.raw key)))
+)
