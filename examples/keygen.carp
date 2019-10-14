@@ -1,0 +1,15 @@
+(load "hydrogen.carp")
+
+(def CONTEXT (Hydro.context "Examples"))
+
+(defn main []
+   (let-do [master-key (HydroKDF.keygen)
+            subkey1 (Hydro.allocate 32)
+            subkey2 (Hydro.allocate 32)
+            subkey3 (Hydro.allocate 64)]
+      (ignore (HydroKDF.derive-from-key subkey1 1 CONTEXT &master-key))
+      (println* &subkey1)
+      (ignore (HydroKDF.derive-from-key subkey2 2 CONTEXT &master-key))
+      (println* &subkey2)
+      (ignore (HydroKDF.derive-from-key subkey3 3 CONTEXT &master-key))
+      (println* &subkey3)))

@@ -83,3 +83,25 @@
       (HydroBuf.raw hash) (HydroBuf.length hash) (HydroBuf.raw msg)
       (HydroBuf.length msg) ctx (HydroBuf.raw key)))
 )
+
+(defmodule HydroKDF
+  (register context-bytes Int "hydro_kdf_CONTEXTBYTES")
+  (register key-bytes Int "hydro_kdf_KEYBYTES")
+  (register bytes-max Int "hydro_kdf_BYTES_MAX")
+  (register bytes-max Int "hydro_kdf_BYTES_MIN")
+
+  (register keygen- (Fn [HydroBufRaw] ()) "hydro_kdf_keygen")
+  (defn keygen []
+    (let-do [k (Hydro.allocate key-bytes)]
+      (keygen- (HydroBuf.raw &k))
+      k))
+
+  (register derive-from-key-
+            (Fn [HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
+            "hydro_kdf_derive_from_key")
+  (defn derive-from-key [subkey id ctx key]
+    (derive-from-key-
+      (HydroBuf.raw &subkey) (HydroBuf.length &subkey) id ctx (HydroBuf.raw key)
+    )
+  )
+)
