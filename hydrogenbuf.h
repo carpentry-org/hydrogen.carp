@@ -5,6 +5,7 @@
 
 typedef uint8_t* HydroBufRaw;
 typedef hydro_hash_state HydroHashState;
+typedef hydro_sign_state HydroSignState;
 typedef hydro_sign_keypair HydroSignKeyPair;
 
 typedef struct {
@@ -54,15 +55,20 @@ hydro_hash_state HydroHash_state() {
   return state;
 }
 
-hydro_sign_keypair Hydro_keypair() {
+hydro_sign_keypair HydroSign_keypair() {
   hydro_sign_keypair pair;
   return pair;
 }
 
-HydroBufRaw Hydro_sk(hydro_sign_keypair* p) {
+HydroBufRaw HydroSign_sk(hydro_sign_keypair* p) {
   return p->sk;
 }
 
-HydroBufRaw Hydro_pk(hydro_sign_keypair* p) {
+HydroBufRaw HydroSign_pk(hydro_sign_keypair* p) {
   return p->pk;
+}
+
+hydro_sign_state HydroSign_state() {
+  hydro_sign_state state;
+  return state;
 }

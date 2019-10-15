@@ -6,7 +6,6 @@
 
 (register-type HydroBuf)
 (register-type HydroBufRaw)
-(register-type HydroSignKeyPair)
 
 (defmodule HydroBuf
   (register str (Fn [(Ref HydroBuf)] String))
@@ -20,10 +19,6 @@
   (register allocate (Fn [Int] HydroBuf))
   (register buf (Fn [(Ref String)] HydroBuf))
   (register unbuf (Fn [(Ref HydroBuf)] String))
-
-  (register keypair (Fn [] HydroSignKeyPair))
-  (register pk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
-  (register sk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
 
   (defn context [s]
     (do
@@ -171,12 +166,19 @@
   (register secret-key-bytes Int "hydro_sign_SECRETKEYBYTES")
   (register seed-bytes Int "hydro_sign_SEEDBYTES")
 
+  (register-type HydroSignKeyPair)
+  (register keypair (Fn [] HydroSignKeyPair))
+  (register pk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
+  (register sk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
+
+
   (register keygen- (Fn [(Ref HydroSignKeyPair)] ()) "hydro_sign_keygen")
   (defn keygen []
-    (let-do [k (Hydro.keypair)]
+    (let-do [k (keypair)]
       (keygen- &k)
       k))
 
+  ; TODO: propagate error
   (register create-
             (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] ())
             "hydro_sign_create")
@@ -185,7 +187,7 @@
       (ignore
         (create-
           (HydroBuf.raw &signature) (HydroBuf.raw &msg) (HydroBuf.length &msg)
-          ctx (Hydro.sk &keypair)
+          ctx (sk &keypair)
         )
       )
       signature))
@@ -197,8 +199,32 @@
     (= 0
       (verify-
         (HydroBuf.raw &signature) (HydroBuf.raw &msg) (HydroBuf.length &msg)
-        ctx (Hydro.sk &keypair)
+        ctx (pk &keypair)
       )
     )
   )
+
+  (register-type HydroSignState)
+  (register state (Fn [] HydroSignState))
+
+  (register init (Fn [(Ref HydroSignState) ctx] Int)
+            "hydro_sign_init")
+
+  (register update- (Fn [(Ref HydroSignState) HydroBufRaw Int] Int)
+            "hydro_sign_update")
+  (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
+
+  ; TODO: check error
+  (register final-create- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
+            "hydro_sign_final_create")
+  (defn final-create [s keypair]
+    (let-do [buf (Hydro.allocate bytes)]
+      (ignore (final-create- s (HydroBuf.raw &buf) (sk keypair)))
+      buf))
+
+  ; TODO: check error
+  (register final-verify- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
+            "hydro_sign_final_verify")
+  (defn final-verify [s signature keypair]
+    (= 0 (final-verify- s (HydroBuf.raw &signature) (pk keypair))))
 )
