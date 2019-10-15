@@ -1,0 +1,9 @@
+(load "hydrogen.carp")
+
+(def CONTEXT (Hydro.context "Examples"))
+(def MSG (Hydro.buf "Test"))
+
+(defn main []
+  (let [keypair (HydroSign.keygen)
+        signature (HydroSign.create MSG CONTEXT keypair)]
+    (println* (HydroSign.verify signature MSG CONTEXT keypair))))

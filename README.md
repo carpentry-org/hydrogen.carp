@@ -12,18 +12,11 @@ derivation is supported.
 (load "git@github.com:carpentry-org/hydrogen.carp.git@master")
 
 (def CONTEXT (Hydro.context "Examples"))
+(def MSG (Hydro.buf "Arbitrary data to hash"))
 
 (defn main []
-   (let-do [hash (Hydro.allocate HydroHash.bytes)
-            key (HydroHash.keygen)]
-      (ignore
-        (HydroHash.gen &hash
-                       (Hydro.buf "Arbitrary data to hash")
-                       CONTEXT
-                       &key
-        )
-      )
-      (println* &hash)))
+   (let-do [key (HydroHash.keygen)]
+      (println* &(HydroHash.gen &MSG CONTEXT &key))))
 ```
 
 ## Usage

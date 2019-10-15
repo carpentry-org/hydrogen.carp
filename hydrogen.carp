@@ -6,6 +6,7 @@
 
 (register-type HydroBuf)
 (register-type HydroBufRaw)
+(register-type HydroSignKeyPair)
 
 (defmodule HydroBuf
   (register str (Fn [(Ref HydroBuf)] String))
@@ -19,6 +20,10 @@
   (register allocate (Fn [Int] HydroBuf))
   (register buf (Fn [(Ref String)] HydroBuf))
   (register unbuf (Fn [(Ref HydroBuf)] String))
+
+  (register keypair (Fn [] HydroSignKeyPair))
+  (register pk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
+  (register sk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
 
   (defn context [s]
     (do
@@ -43,9 +48,11 @@
   (register reseed (Fn [] ()) "hydro_random_reseed")
   (register buf-deterministic- (Fn [HydroBufRaw Int HydroBufRaw] ())
             "hydro_random_buf_deterministic")
-  (defn buf-deterministic [buf bytes]
-    (buf-deterministic-
-      (HydroBuf.raw buf) (HydroBuf.length buf) (HydroBuf.raw bytes)))
+  (defn buf-deterministic [len bytes]
+    (let-do [buf (Hydro.allocate len)]
+      (buf-deterministic-
+        (HydroBuf.raw &buf) (HydroBuf.length &buf) (HydroBuf.raw bytes))
+      buf))
 )
 
 (defmodule HydroHash
@@ -72,17 +79,24 @@
             "hydro_hash_update")
   (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
 
+  ; TODO: check error
   (register final- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
             "hydro_hash_final")
-  (defn final [s buf] (final- s (HydroBuf.raw buf) (HydroBuf.length buf)))
+  (defn final [s]
+    (let-do [buf (Hydro.allocate bytes)]
+      (ignore (final- s (HydroBuf.raw &buf) (HydroBuf.length &buf)))
+      buf))
 
   (register gen-
             (Fn [HydroBufRaw Int HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_hash_hash")
-  (defn gen [hash msg ctx key]
-    (gen-
-      (HydroBuf.raw hash) (HydroBuf.length hash) (HydroBuf.raw msg)
-      (HydroBuf.length msg) ctx (HydroBuf.raw key)))
+  (defn gen [msg ctx key]
+    (let-do [hash (Hydro.allocate bytes)]
+      (ignore
+        (gen-
+          (HydroBuf.raw &hash) (HydroBuf.length &hash) (HydroBuf.raw msg)
+          (HydroBuf.length msg) ctx (HydroBuf.raw key)))
+      hash))
 )
 
 (defmodule HydroKDF
@@ -100,11 +114,13 @@
   (register derive-from-key-
             (Fn [HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_kdf_derive_from_key")
-  (defn derive-from-key [subkey id ctx key]
-    (derive-from-key-
-      (HydroBuf.raw &subkey) (HydroBuf.length &subkey) id ctx (HydroBuf.raw key)
-    )
-  )
+  ; TODO: check error
+  (defn derive-from-key [subkey-len id ctx key]
+    (let-do [sub (Hydro.allocate subkey-len)]
+      (ignore (derive-from-key-
+        (HydroBuf.raw &sub) (HydroBuf.length &sub) id ctx (HydroBuf.raw key)
+      ))
+      sub))
 )
 
 (defmodule HydroSecretBox
@@ -119,7 +135,7 @@
       (keygen- (HydroBuf.raw &k))
       k))
 
-  ; TODO propagate error
+  ; TODO check error
   (register encrypt-
             (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_secretbox_encrypt")
@@ -146,4 +162,43 @@
         )
       )
       m))
+)
+
+(defmodule HydroSign
+  (register bytes Int "hydro_sign_BYTES")
+  (register context-bytes Int "hydro_sign_CONTEXTBYTES")
+  (register public-key-bytes Int "hydro_sign_PUBLICKEYBYTES")
+  (register secret-key-bytes Int "hydro_sign_SECRETKEYBYTES")
+  (register seed-bytes Int "hydro_sign_SEEDBYTES")
+
+  (register keygen- (Fn [(Ref HydroSignKeyPair)] ()) "hydro_sign_keygen")
+  (defn keygen []
+    (let-do [k (Hydro.keypair)]
+      (keygen- &k)
+      k))
+
+  (register create-
+            (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] ())
+            "hydro_sign_create")
+  (defn create [msg ctx keypair]
+    (let-do [signature (Hydro.allocate bytes)]
+      (ignore
+        (create-
+          (HydroBuf.raw &signature) (HydroBuf.raw &msg) (HydroBuf.length &msg)
+          ctx (Hydro.sk &keypair)
+        )
+      )
+      signature))
+
+  (register verify-
+            (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
+            "hydro_sign_create")
+  (defn verify [signature msg ctx keypair]
+    (= 0
+      (verify-
+        (HydroBuf.raw &signature) (HydroBuf.raw &msg) (HydroBuf.length &msg)
+        ctx (Hydro.sk &keypair)
+      )
+    )
+  )
 )

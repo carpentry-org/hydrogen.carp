@@ -4,7 +4,5 @@
 (def MSG (Hydro.buf "Arbitrary data to hash"))
 
 (defn main []
-   (let-do [hash (Hydro.allocate HydroHash.bytes)
-            key (HydroHash.keygen)]
-      (ignore (HydroHash.gen &hash &MSG CONTEXT &key))
-      (println* &hash)))
+   (let-do [key (HydroHash.keygen)]
+      (println* &(HydroHash.gen &MSG CONTEXT &key))))

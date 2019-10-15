@@ -8,9 +8,7 @@
     (println* &(HydroRandom.uniform 100))
     (HydroRandom.ratchet)
     (HydroRandom.reseed)
-    (let-do [b (Hydro.allocate 16)
-             seed (Hydro.buf &(String.allocate HydroRandom.seed-bytes \x))]
-      (HydroRandom.buf-deterministic &b &seed)
-      (println* &b))
+    (let-do [seed (Hydro.buf &(String.allocate HydroRandom.seed-bytes \x))]
+      (println* &(HydroRandom.buf-deterministic 16 &seed)))
   )
 )
