@@ -293,4 +293,23 @@
                   threads-max)))
   (defn verify [hash pwd master-key]
     (verify-with hash pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
+
+  (register derive-static-key-
+            (Fn [HydroBufRaw Int HydroBufRaw (Ptr Char) Int (Ptr Char)
+                 HydroBufRaw Int Int Int]
+                 Int)
+            "hydro_pwhash_derive_static_key")
+  (defn derive-static-key-with [static-key-len stored pwd ctx master-key
+                                ops-limit-max mem-limit-max threads-max]
+    (let [static-key (Hydro.allocate static-key-len)]
+      (if (= 0 (derive-static-key-
+        (HydroBuf.raw &static-key) static-key-len (HydroBuf.raw stored)
+        (cstr pwd) (length pwd) ctx (HydroBuf.raw master-key) ops-limit-max
+        mem-limit-max threads-max))
+        (Maybe.Just static-key)
+        (Maybe.Nothing))))
+  (defn derive-static-key [static-key-len stored pwd ctx master-key]
+    (derive-static-key-with
+      static-key-len stored pwd ctx master-key dflt-ops-limit dflt-mem-limit
+      dflt-threads))
 )
