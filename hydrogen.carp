@@ -312,4 +312,20 @@
     (derive-static-key-with
       static-key-len stored pwd ctx master-key dflt-ops-limit dflt-mem-limit
       dflt-threads))
+
+  (register reencrypt- (Fn [HydroBufRaw HydroBufRaw HydroBufRaw] Int)
+            "hydro_pwhash_reencrypt")
+  (defn reencrypt [stored old-master-key new-master-key]
+    (if (= 0 (reencrypt- (HydroBuf.raw &stored) (HydroBuf.raw old-master-key)
+                         (HydroBuf.raw new-master-key)))
+      (Maybe.Just stored)
+      (Maybe.Nothing)))
+
+  (register upgrade- (Fn [HydroBufRaw HydroBufRaw Int Int Int] Int)
+            "hydro_pwhash_upgrade")
+  (defn upgrade [stored master-key ops-limit mem-limit threads]
+    (if (= 0 (upgrade- (HydroBuf.raw &stored) (HydroBuf.raw master-key)
+                       ops-limit mem-limit threads))
+      (Maybe.Just stored)
+      (Maybe.Nothing)))
 )

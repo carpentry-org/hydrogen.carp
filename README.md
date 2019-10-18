@@ -5,7 +5,7 @@
 A simple wrapper around [libhydrogen](https://github.com/jedisct1/libhydrogen)
 for Carp.
 
-Currently the library does not support password hashing or key derivation.
+Currently the library does not support key derivation.
 
 ```clojure
 (load "git@github.com:carpentry-org/hydrogen.carp.git@master")
