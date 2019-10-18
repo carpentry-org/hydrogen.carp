@@ -329,3 +329,14 @@
       (Maybe.Just stored)
       (Maybe.Nothing)))
 )
+
+(defmodule HydroKX
+  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
+  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
+  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
+  (register psk-bytes Int "hydro_kx_PSKBYTES")
+
+  (register-type HydroKXKeyPair)
+  (register-type HydroKXSessionKeyPair)
+  (register-type HydroKXState)
+)
