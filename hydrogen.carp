@@ -20,6 +20,15 @@
   (register buf (Fn [(Ref String)] HydroBuf))
   (register unbuf (Fn [(Ref HydroBuf)] String))
 
+  (register erase- (Fn [HydroBufRaw Int] ()))
+  (defn erase [b] (erase- (HydroBuf.raw b) (HydroBuf.length b)))
+
+  (register eq- (Fn [HydroBufRaw HydroBufRaw Int] Bool))
+  (defn = [a b]
+    (and
+      (= (HydroBuf.length a) (HydroBuf.length b))
+      (eq- (HydroBuf.raw a) (HydroBuf.raw b) (HydroBuf.length a))))
+
   (defn context [s]
     (do
       (assert (= (length s) 8))
