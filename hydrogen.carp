@@ -9,9 +9,14 @@
 
 (defmodule HydroBuf
   (register str (Fn [(Ref HydroBuf)] String))
+  (defn prn [a] (HydroBuf.str a))
   (register array (Fn [(Ref HydroBuf)] (Array Char)))
   (register length (Fn [(Ref HydroBuf)] Int))
   (register raw (Fn [(Ref HydroBuf)] HydroBufRaw))
+)
+; needed for printing mapped in maybe
+(defmodule HydroBufCopy
+  (defn prn [a] (HydroBuf.str &a))
 )
 
 (defmodule Hydro
@@ -83,24 +88,25 @@
             "hydro_hash_update")
   (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
 
-  ; TODO: check error
   (register final- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
             "hydro_hash_final")
   (defn final [s]
-    (let-do [buf (Hydro.allocate bytes)]
-      (ignore (final- s (HydroBuf.raw &buf) (HydroBuf.length &buf)))
-      buf))
+    (let [buf (Hydro.allocate bytes)]
+      (if (= (final- s (HydroBuf.raw &buf) (HydroBuf.length &buf)) 0)
+        (Maybe.Just buf)
+        (Maybe.Nothing))))
 
   (register gen-
             (Fn [HydroBufRaw Int HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_hash_hash")
   (defn gen [msg ctx key]
-    (let-do [hash (Hydro.allocate bytes)]
-      (ignore
+    (let [hash (Hydro.allocate bytes)]
+      (if (= 0
         (gen-
           (HydroBuf.raw &hash) (HydroBuf.length &hash) (HydroBuf.raw msg)
           (HydroBuf.length msg) ctx (HydroBuf.raw key)))
-      hash))
+        (Maybe.Just hash)
+        (Maybe.Nothing))))
 )
 
 (defmodule HydroKDF
@@ -118,13 +124,13 @@
   (register derive-from-key-
             (Fn [HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_kdf_derive_from_key")
-  ; TODO: check error
   (defn derive-from-key [subkey-len id ctx key]
-    (let-do [sub (Hydro.allocate subkey-len)]
-      (ignore (derive-from-key-
+    (let [sub (Hydro.allocate subkey-len)]
+      (if (= 0 (derive-from-key-
         (HydroBuf.raw &sub) (HydroBuf.length &sub) id ctx (HydroBuf.raw key)
-      ))
-      sub))
+        ))
+        (Maybe.Just sub)
+        (Maybe.Nothing))))
 )
 
 (defmodule HydroSecretBox
@@ -139,33 +145,31 @@
       (keygen- (HydroBuf.raw &k))
       k))
 
-  ; TODO check error
   (register encrypt-
             (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_secretbox_encrypt")
   (defn encrypt [m id ctx key]
-    (let-do [c (Hydro.allocate (+ (HydroBuf.length m) header-bytes))]
-      (ignore
+    (let [c (Hydro.allocate (+ (HydroBuf.length m) header-bytes))]
+      (if (= 0
         (encrypt-
           (HydroBuf.raw &c) (HydroBuf.raw m) (HydroBuf.length m) id
           ctx (HydroBuf.raw key)
-        )
-      )
-      c))
+        ))
+        (Maybe.Just c)
+        (Maybe.Nothing))))
 
-  ; TODO propagate error
   (register decrypt-
             (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_secretbox_decrypt")
   (defn decrypt [c id ctx key]
-    (let-do [m (Hydro.allocate (- (HydroBuf.length c) header-bytes))]
-      (ignore
+    (let [m (Hydro.allocate (- (HydroBuf.length c) header-bytes))]
+      (if (= 0
         (decrypt-
           (HydroBuf.raw &m) (HydroBuf.raw c) (HydroBuf.length c) id
           ctx (HydroBuf.raw key)
-        )
-      )
-      m))
+        ))
+        (Maybe.Just m)
+        (Maybe.Nothing))))
 )
 
 (defmodule HydroSign
@@ -187,19 +191,18 @@
       (keygen- &k)
       k))
 
-  ; TODO: propagate error
   (register create-
-            (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] ())
+            (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_sign_create")
   (defn create [msg ctx keypair]
-    (let-do [signature (Hydro.allocate bytes)]
-      (ignore
+    (let [signature (Hydro.allocate bytes)]
+      (if (= 0
         (create-
           (HydroBuf.raw &signature) (HydroBuf.raw &msg) (HydroBuf.length &msg)
           ctx (sk &keypair)
-        )
-      )
-      signature))
+        ))
+        (Maybe.Just signature)
+        (Maybe.Nothing))))
 
   (register verify-
             (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
@@ -223,15 +226,14 @@
             "hydro_sign_update")
   (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
 
-  ; TODO: check error
   (register final-create- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
             "hydro_sign_final_create")
   (defn final-create [s keypair]
     (let-do [buf (Hydro.allocate bytes)]
-      (ignore (final-create- s (HydroBuf.raw &buf) (sk keypair)))
-      buf))
+      (if (= 0 (final-create- s (HydroBuf.raw &buf) (sk keypair)))
+        (Maybe.Just buf)
+        (Maybe.Nothing))))
 
-  ; TODO: check error
   (register final-verify- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
             "hydro_sign_final_verify")
   (defn final-verify [s signature keypair]
@@ -253,33 +255,32 @@
       (keygen- (HydroBuf.raw &k))
       k))
 
-  ; TODO: check error
   (register hash-deterministic-
             (Fn [HydroBufRaw Int (Ptr Char) Int (Ptr Char) HydrobBufRaw Int]
                 Int)
             "hydro_pwhash_deterministic")
   (defn hash-deterministic [len pwd ctx master-key ops-limit]
-    (let-do [h (Hydro.allocate len)]
-      (ignore
+    (let [h (Hydro.allocate len)]
+      (if (= 0
         (hash-deterministic
           (HydroBuf.raw &h) len (cstr pwd) (length pwd) (HydroBuf.raw ctx)
           (HydroBuf.raw master-key) ops-limit
-        )
-      )
-      h))
+        ))
+        (Maybe.Just h)
+        (Maybe.Nothing))))
 
   (register create-
             (Fn [HydroBufRaw (Ptr Char) Int HydroBufRaw Int Int Int] Int)
             "hydro_pwhash_create")
   (defn create-with [pwd master-key ops-limit mem-limit threads]
-    (let-do [h (Hydro.allocate stored-bytes)]
-      (ignore
+    (let [h (Hydro.allocate stored-bytes)]
+      (if (= 0
         (create-
           (HydroBuf.raw &h) (cstr pwd) (length pwd) (HydroBuf.raw master-key)
           ops-limit mem-limit threads
-        )
-      )
-      h))
+        ))
+        (Maybe.Just h)
+        (Maybe.Nothing))))
   (defn create [pwd master-key]
     (create-with pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
 

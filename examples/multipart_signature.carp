@@ -10,7 +10,7 @@
       (ignore (HydroSign.init &state CONTEXT))
       (ignore (HydroSign.update &state &MSG))
       (ignore (HydroSign.update &state &MSG2))
-      (let-do [signature (HydroSign.final-create &state &key)]
+      (let-do [signature (Maybe.unsafe-from (HydroSign.final-create &state &key))]
         (ignore (HydroSign.init &state CONTEXT))
         (ignore (HydroSign.update &state &MSG))
         (ignore (HydroSign.update &state &MSG2))

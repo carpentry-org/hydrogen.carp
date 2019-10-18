@@ -5,5 +5,5 @@
 
 (defn main []
   (let [keypair (HydroSign.keygen)
-        signature (HydroSign.create MSG CONTEXT keypair)]
+        signature (Maybe.unsafe-from (HydroSign.create MSG CONTEXT keypair))]
     (println* (HydroSign.verify signature MSG CONTEXT keypair))))

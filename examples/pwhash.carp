@@ -4,5 +4,5 @@
 
 (defn main []
   (let [master-key (HydroPWHash.keygen)
-        hash (HydroPWHash.create PW &master-key)]
+        hash (Maybe.unsafe-from (HydroPWHash.create PW &master-key))]
     (println* &hash " " (HydroPWHash.verify hash PW &master-key))))
