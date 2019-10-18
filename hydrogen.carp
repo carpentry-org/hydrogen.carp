@@ -20,10 +20,10 @@
   (register buf (Fn [(Ref String)] HydroBuf))
   (register unbuf (Fn [(Ref HydroBuf)] String))
 
-  (register erase- (Fn [HydroBufRaw Int] ()))
+  (register erase- (Fn [HydroBufRaw Int] ()) "hydro_memzero")
   (defn erase [b] (erase- (HydroBuf.raw b) (HydroBuf.length b)))
 
-  (register eq- (Fn [HydroBufRaw HydroBufRaw Int] Bool))
+  (register eq- (Fn [HydroBufRaw HydroBufRaw Int] Bool) "hydro_equal")
   (defn = [a b]
     (and
       (= (HydroBuf.length a) (HydroBuf.length b))
