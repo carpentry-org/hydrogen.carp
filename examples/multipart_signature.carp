@@ -1,0 +1,17 @@
+(load "hydrogen.carp")
+
+(def CONTEXT (Hydro.context "Examples"))
+(def MSG (Hydro.buf "Test"))
+(def MSG2 (Hydro.buf "Multipart"))
+
+(defn main []
+   (let-do [key (HydroSign.keygen)
+            state (HydroSign.state)]
+      (ignore (HydroSign.init &state CONTEXT))
+      (ignore (HydroSign.update &state &MSG))
+      (ignore (HydroSign.update &state &MSG2))
+      (let-do [signature (HydroSign.final-create &state &key)]
+        (ignore (HydroSign.init &state CONTEXT))
+        (ignore (HydroSign.update &state &MSG))
+        (ignore (HydroSign.update &state &MSG2))
+        (println* &(HydroSign.final-verify &state signature &key)))))
