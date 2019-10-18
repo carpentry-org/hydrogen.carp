@@ -237,3 +237,59 @@
   (defn final-verify [s signature keypair]
     (= 0 (final-verify- s (HydroBuf.raw &signature) (pk keypair))))
 )
+
+(defmodule HydroPWHash
+  (register context-bytes Int "hydro_pwhash_CONTEXTBYTES")
+  (register master-key-bytes Int "hydro_pwhash_MASTERKEYBYTES")
+  (register stored-bytes Int "hydro_pwhash_STOREDBYTES")
+
+  (def dflt-ops-limit 10000)
+  (def dflt-mem-limit 0)
+  (def dflt-threads 1)
+
+  (register keygen- (Fn [HydroBufRaw] ()) "hydro_pwhash_keygen")
+  (defn keygen []
+    (let-do [k (Hydro.allocate master-key-bytes)]
+      (keygen- (HydroBuf.raw &k))
+      k))
+
+  ; TODO: check error
+  (register hash-deterministic-
+            (Fn [HydroBufRaw Int (Ptr Char) Int (Ptr Char) HydrobBufRaw Int]
+                Int)
+            "hydro_pwhash_deterministic")
+  (defn hash-deterministic [len pwd ctx master-key ops-limit]
+    (let-do [h (Hydro.allocate len)]
+      (ignore
+        (hash-deterministic
+          (HydroBuf.raw &h) len (cstr pwd) (length pwd) (HydroBuf.raw ctx)
+          (HydroBuf.raw master-key) ops-limit
+        )
+      )
+      h))
+
+  (register create-
+            (Fn [HydroBufRaw (Ptr Char) Int HydroBufRaw Int Int Int] Int)
+            "hydro_pwhash_create")
+  (defn create-with [pwd master-key ops-limit mem-limit threads]
+    (let-do [h (Hydro.allocate stored-bytes)]
+      (ignore
+        (create-
+          (HydroBuf.raw &h) (cstr pwd) (length pwd) (HydroBuf.raw master-key)
+          ops-limit mem-limit threads
+        )
+      )
+      h))
+  (defn create [pwd master-key]
+    (create-with pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
+
+  (register verify-
+            (Fn [HydroBufRaw (Ptr Char) Int HydroBufRaw Int Int Int] Int)
+            "hydro_pwhash_verify")
+  (defn verify-with [hash pwd master-key ops-limit-max mem-limit-max threads-max]
+    (= 0 (verify- (HydroBuf.raw &hash) (cstr pwd) (length pwd)
+                  (HydroBuf.raw master-key) ops-limit-max mem-limit-max
+                  threads-max)))
+  (defn verify [hash pwd master-key]
+    (verify-with hash pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
+)

@@ -1,0 +1,8 @@
+(load "hydrogen.carp")
+
+(def PW "mypw")
+
+(defn main []
+  (let [master-key (HydroPWHash.keygen)
+        hash (HydroPWHash.create PW &master-key)]
+    (println* &hash " " (HydroPWHash.verify hash PW &master-key))))
