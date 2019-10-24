@@ -4,13 +4,14 @@
                                  "/libhydrogen/hydrogen.c"
 ]))
 
+(hidden HydroBuf)
 (register-type HydroBuf)
+(hidden HydroBufRaw)
 (register-type HydroBufRaw)
 
 (defmodule HydroBuf
   (register str (Fn [(Ref HydroBuf)] String))
   (defn prn [a] (HydroBuf.str a))
-  (register array (Fn [(Ref HydroBuf)] (Array Char)))
   (register length (Fn [(Ref HydroBuf)] Int))
   (register raw (Fn [(Ref HydroBuf)] HydroBufRaw))
 )
@@ -19,21 +20,39 @@
   (defn prn [a] (HydroBuf.str &a))
 )
 
+(doc Hydro "The base hydrogen module. It includes functions for creating and
+handling hydrogen buffers.")
 (defmodule Hydro
+  (private init)
+  (hidden init)
   (register init (Fn [] ()) "hydro_init")
+  (doc allocate "allocates a `HydroBuf` of a fixed length.")
   (register allocate (Fn [Int] HydroBuf))
+  (doc buf "creates a `HydroBuf` from a string.")
   (register buf (Fn [(Ref String)] HydroBuf))
+  (doc unbuf "creates a string from a `HydroBuf`.")
   (register unbuf (Fn [(Ref HydroBuf)] String))
+  (doc to-array "creates an array from a `HydroBuf`.")
+  (register to-array (Fn [(Ref HydroBuf)] (Array Byte)))
 
+  (private erase-)
+  (hidden erase-)
   (register erase- (Fn [HydroBufRaw Int] ()) "hydro_memzero")
+  (doc erase "erases the contents of a `HydroBuf` securely.")
   (defn erase [b] (erase- (HydroBuf.raw b) (HydroBuf.length b)))
 
+  (private eq-)
+  (hidden eq-)
   (register eq- (Fn [HydroBufRaw HydroBufRaw Int] Bool) "hydro_equal")
+  (doc = "compares two `HydroBuf` instances in constant time. Comparing the
+same reference will lead to a failed comparison, as per the [hydrogen
+specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-for-equality).")
   (defn = [a b]
     (and
       (= (HydroBuf.length a) (HydroBuf.length b))
       (eq- (HydroBuf.raw a) (HydroBuf.raw b) (HydroBuf.length a))))
 
+  (doc context "creates a context from a string.")
   (defn context [s]
     (do
       (assert (= (length s) 8))
@@ -42,25 +61,45 @@
 
 (Hydro.init)
 
+(doc HydroRandom "This module contains functions for the creation of random
+numbers and handling of the random number generator.")
 (defmodule HydroRandom
+  (private seed-bytes)
+  (hidden seed-bytes)
   (register seed-bytes Int "hydro_random_SEEDBYTES")
 
+  (doc u32 "creates an unsigned random number of 32 bit length.")
   (register u32 (Fn [] Int) "hydro_random_u32")
+  (doc uniform "creates a uniform random number from 0 to an upper limit
+provided as argument.")
   (register uniform (Fn [Int] Int) "hydro_random_uniform")
+  (private buf-)
+  (hidden buf)
   (register buf- (Fn [HydroBufRaw Int] ()) "hydro_random_buf")
+  (doc buf "creates a buffer containing random numbers.")
   (defn buf [n]
     (let-do [b (Hydro.allocate n)]
       (buf- (HydroBuf.raw &b) n)
       b))
 
+  (doc ratchet "erases part of the RNG state to make recovering previous RNG
+states impossible.")
   (register ratchet (Fn [] ()) "hydro_random_ratchet")
+  (doc reseed "reseeds the RNG; this is important to do after starting new
+threads.")
   (register reseed (Fn [] ()) "hydro_random_reseed")
+  (private buf-deterministic-)
+  (hidden buf-deterministic-)
   (register buf-deterministic- (Fn [HydroBufRaw Int HydroBufRaw] ())
             "hydro_random_buf_deterministic")
-  (defn buf-deterministic [len bytes]
+  (doc buf-deterministic "creates a buffer containing `len` numbers
+indistinguishable from random bytes without knowing `seed`. For a given seed,
+this function will always output the same sequence. This function is mainly
+useful for writing tests.")
+  (defn buf-deterministic [len seed]
     (let-do [buf (Hydro.allocate len)]
       (buf-deterministic-
-        (HydroBuf.raw &buf) (HydroBuf.length &buf) (HydroBuf.raw bytes))
+        (HydroBuf.raw &buf) (HydroBuf.length &buf) (HydroBuf.raw seed))
       buf))
 )
 

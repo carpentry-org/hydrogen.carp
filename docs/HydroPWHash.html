@@ -1,0 +1,503 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                HydroPWHash
+            </h1>
+            <div class="module-description">
+                
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#context-bytes">
+                    <h3 id="context-bytes">
+                        context-bytes
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create">
+                    <h3 id="create">
+                        create
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [&amp;String, (Ref HydroBuf)] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (create pwd master-key)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create-">
+                    <h3 id="create-">
+                        create-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, (Ptr Char), Int, HydroBufRaw, Int, Int, Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create-with">
+                    <h3 id="create-with">
+                        create-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [&amp;String, (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (create-with pwd master-key ops-limit mem-limit threads)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#derive-static-key">
+                    <h3 id="derive-static-key">
+                        derive-static-key
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, (Ref HydroBuf), &amp;String, (Ptr Char), (Ref HydroBuf)] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (derive-static-key static-key-len stored pwd ctx master-key)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#derive-static-key-">
+                    <h3 id="derive-static-key-">
+                        derive-static-key-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, Int, HydroBufRaw, (Ptr Char), Int, (Ptr Char), HydroBufRaw, Int, Int, Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#derive-static-key-with">
+                    <h3 id="derive-static-key-with">
+                        derive-static-key-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, (Ref HydroBuf), &amp;String, (Ptr Char), (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (derive-static-key-with static-key-len stored pwd ctx master-key ops-limit-max mem-limit-max threads-max)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#dflt-mem-limit">
+                    <h3 id="dflt-mem-limit">
+                        dflt-mem-limit
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#dflt-ops-limit">
+                    <h3 id="dflt-ops-limit">
+                        dflt-ops-limit
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#dflt-threads">
+                    <h3 id="dflt-threads">
+                        dflt-threads
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#hash-deterministic">
+                    <h3 id="hash-deterministic">
+                        hash-deterministic
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, &amp;String, (Ref HydroBuf), (Ref HydroBuf), a] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (hash-deterministic len pwd ctx master-key ops-limit)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#hash-deterministic-">
+                    <h3 id="hash-deterministic-">
+                        hash-deterministic-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, Int, (Ptr Char), Int, (Ptr Char), HydrobBufRaw, Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#keygen">
+                    <h3 id="keygen">
+                        keygen
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [] HydroBuf)
+                </p>
+                <pre class="args">
+                    (keygen)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#keygen-">
+                    <h3 id="keygen-">
+                        keygen-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw] ())
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#master-key-bytes">
+                    <h3 id="master-key-bytes">
+                        master-key-bytes
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#reencrypt">
+                    <h3 id="reencrypt">
+                        reencrypt
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [HydroBuf, (Ref HydroBuf), (Ref HydroBuf)] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (reencrypt stored old-master-key new-master-key)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#reencrypt-">
+                    <h3 id="reencrypt-">
+                        reencrypt-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, HydroBufRaw, HydroBufRaw] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#stored-bytes">
+                    <h3 id="stored-bytes">
+                        stored-bytes
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#upgrade">
+                    <h3 id="upgrade">
+                        upgrade
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [HydroBuf, (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                </p>
+                <pre class="args">
+                    (upgrade stored master-key ops-limit mem-limit threads)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#upgrade-">
+                    <h3 id="upgrade-">
+                        upgrade-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, HydroBufRaw, Int, Int, Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify">
+                    <h3 id="verify">
+                        verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [HydroBuf, &amp;String, (Ref HydroBuf)] Bool)
+                </p>
+                <pre class="args">
+                    (verify hash pwd master-key)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify-">
+                    <h3 id="verify-">
+                        verify-
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [HydroBufRaw, (Ptr Char), Int, HydroBufRaw, Int, Int, Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify-with">
+                    <h3 id="verify-with">
+                        verify-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [HydroBuf, &amp;String, (Ref HydroBuf), Int, Int, Int] Bool)
+                </p>
+                <pre class="args">
+                    (verify-with hash pwd master-key ops-limit-max mem-limit-max threads-max)
+                </pre>
+                <p class="doc">
+                    
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

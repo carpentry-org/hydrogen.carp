@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                Hydro
+            </h1>
+            <div class="module-description">
+                <p>The base hydrogen module. It includes functions for creating and
+handling hydrogen buffers.</p>
+
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#=">
+                    <h3 id="=">
+                        =
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroBuf), (Ref HydroBuf)] Bool)
+                </p>
+                <pre class="args">
+                    (= a b)
+                </pre>
+                <p class="doc">
+                    <p>compares two <code>HydroBuf</code> instances in constant time. Comparing the
+same reference will lead to a failed comparison, as per the <a href="https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-for-equality">hydrogen
+specs</a>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#allocate">
+                    <h3 id="allocate">
+                        allocate
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [Int] HydroBuf)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>allocates a <code>HydroBuf</code> of a fixed length.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#buf">
+                    <h3 id="buf">
+                        buf
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [&amp;String] HydroBuf)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>creates a <code>HydroBuf</code> from a string.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#context">
+                    <h3 id="context">
+                        context
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [&amp;String] (Ptr Char))
+                </p>
+                <pre class="args">
+                    (context s)
+                </pre>
+                <p class="doc">
+                    <p>creates a context from a string.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#erase">
+                    <h3 id="erase">
+                        erase
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroBuf)] ())
+                </p>
+                <pre class="args">
+                    (erase b)
+                </pre>
+                <p class="doc">
+                    <p>erases the contents of a <code>HydroBuf</code> securely.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#to-array">
+                    <h3 id="to-array">
+                        to-array
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroBuf)] (Array Byte))
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>creates an array from a <code>HydroBuf</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#unbuf">
+                    <h3 id="unbuf">
+                        unbuf
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroBuf)] String)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>creates a string from a <code>HydroBuf</code>.</p>
+
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,31 @@
+(load "hydrogen.carp")
+
+(Project.config "title" "Hydrogen")
+(Project.config "docs-directory" "./docs/")
+(Project.config "docs-logo" "")
+(Project.config "docs-url" "https://github.com/carpentry-org/hydrogen")
+(Project.config "docs-styling" "style.css")
+(Project.config "docs-prelude" "The hydrogen package is a collection of modules
+that wrap the [hydrogen](https://github.com/jedisct1/libhydrogen) cryptography
+library.
+
+While the documentation aims to be somewhat comprehensive, looking at the
+[documentation of hydrogen](https://github.com/jedisct1/libhydrogen/wiki) is
+encouraged for additional context.
+
+```
+(load \"git@github.com:carpentry-org/hydrogen.carp.git@master\")
+
+(def context (Hydro.context \"Examples\"))
+(def msg (Hydro.buf \"Arbitrary data to hash\"))
+
+(defn main []
+   (let [key (HydroHash.keygen)]
+      (println* &(HydroHash.gen &msg context &key))))
+```
+")
+
+(save-docs
+  Hydro HydroRandom HydroHash HydroKDF HydroSecretBox HydroSign HydroPWHash
+)
+(quit)

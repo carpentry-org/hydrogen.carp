@@ -29,7 +29,8 @@ program:
 ```
 
 If you want to see how to use the library, you can look at the
-[examples/](/examples) directory.
+[examples/](/examples) directory or look at the [docs
+website](https://veitheller.de/hydrogen/).
 
 <hr/>
 

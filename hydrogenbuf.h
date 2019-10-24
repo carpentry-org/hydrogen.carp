@@ -34,6 +34,15 @@ String Hydro_unbuf(HydroBuf* s) {
   return res;
 }
 
+Array Hydro_to_MINUS_array(HydroBuf* s) {
+  Array res;
+  res.data = malloc(s->length);
+  res.len = s->length;
+  res.capacity = s->length;
+  memcpy(res.data, s->buf, s->length);
+  return res;
+}
+
 String HydroBuf_str(HydroBuf* buf) {
   char* res = malloc(buf->length*2+1);
   for (int i = 0; i < buf->length; i++) {
