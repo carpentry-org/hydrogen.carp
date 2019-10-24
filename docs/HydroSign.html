@@ -59,45 +59,18 @@
                 HydroSign
             </h1>
             <div class="module-description">
-                
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#bytes">
-                    <h3 id="bytes">
-                        bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#context-bytes">
-                    <h3 id="context-bytes">
-                        context-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
+                <p>This module contains functions for signing data, both single-
+and multi-part.</p>
+<p>Example:</p>
+<pre><code>(def context (Hydro.context &quot;Examples&quot;))
+(def msg (Hydro.buf &quot;Test&quot;))
+
+(let [keypair (HydroSign.keygen)
+      signature (Maybe.unsafe-from (HydroSign.create msg context
+                                                     keypair))]
+  (println* (HydroSign.verify signature msg context keypair))))
+</code></pre>
+
             </div>
             <div class="binder">
                 <a class="anchor" href="#create">
@@ -115,26 +88,9 @@
                     (create msg ctx keypair)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#create-">
-                    <h3 id="create-">
-                        create-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, HydroBufRaw, Int, (Ptr Char), HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>signs a message <code>msg</code>, using the context <code>ctx</code> and the keypair
+<code>keypair</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -153,26 +109,9 @@
                     (final-create s keypair)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#final-create-">
-                    <h3 id="final-create-">
-                        final-create-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignState), HydroBufRaw, HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>finalizes a sign state <code>s</code> with a keypair <code>keypair</code>.
+Returns a signature.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -191,26 +130,10 @@
                     (final-verify s signature keypair)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#final-verify-">
-                    <h3 id="final-verify-">
-                        final-verify-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignState), HydroBufRaw, HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>finalizes a sign state <code>s</code> with a signature <code>signature</code>
+and a keypair <code>keypair</code>. Returns a boolean signifying whether we were able to
+verify the signature.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -223,13 +146,14 @@
                     external
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), ctx] Int)
+                    (λ [(Ref HydroSignState), (Ptr Char)] Bool)
                 </p>
                 <span>
                     
                 </span>
                 <p class="doc">
-                    
+                    <p>initializes a state for multi-part signing, using a context.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -248,45 +172,8 @@
                     (keygen)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#keygen-">
-                    <h3 id="keygen-">
-                        keygen-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignKeyPair)] ())
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#keypair">
-                    <h3 id="keypair">
-                        keypair
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [] HydroSignKeyPair)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>generates a key for use in signing procedures.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -305,64 +192,8 @@
                     
                 </span>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#public-key-bytes">
-                    <h3 id="public-key-bytes">
-                        public-key-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#secret-key-bytes">
-                    <h3 id="secret-key-bytes">
-                        secret-key-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#seed-bytes">
-                    <h3 id="seed-bytes">
-                        seed-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>gets a public key from a keypair.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -381,7 +212,8 @@
                     
                 </span>
                 <p class="doc">
-                    
+                    <p>gets a secret key from a keypair.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -400,7 +232,8 @@
                     
                 </span>
                 <p class="doc">
-                    
+                    <p>generates a state for multi-part signing.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -419,26 +252,8 @@
                     (update s buf)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#update-">
-                    <h3 id="update-">
-                        update-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignState), HydroBufRaw, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>updates a sign state <code>s</code> with a buffer <code>buf</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -457,26 +272,9 @@
                     (verify signature msg ctx keypair)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#verify-">
-                    <h3 id="verify-">
-                        verify-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, HydroBufRaw, Int, (Ptr Char), HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>verifies a signature <code>signature</code> for a message <code>msg</code>, using the
+context <code>ctx</code> and the keypair <code>keypair</code>.</p>
+
                 </p>
             </div>
         </div>

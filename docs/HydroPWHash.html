@@ -59,26 +59,15 @@
                 HydroPWHash
             </h1>
             <div class="module-description">
-                
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#context-bytes">
-                    <h3 id="context-bytes">
-                        context-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
+                <p>This module contains functions for hashing passwords.</p>
+<p>Example:</p>
+<pre><code>(def pw &quot;my password&quot;)
+
+(let [master-key (HydroPWHash.keygen)
+      hash (Maybe.unsafe-from (HydroPWHash.create pw &amp;master-key))]
+  (println* (HydroPWHash.verify hash pw &amp;master-key)))
+</code></pre>
+
             </div>
             <div class="binder">
                 <a class="anchor" href="#create">
@@ -96,26 +85,10 @@
                     (create pwd master-key)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#create-">
-                    <h3 id="create-">
-                        create-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, (Ptr Char), Int, HydroBufRaw, Int, Int, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>generates a hash from the password <code>pwd</code>, using the master
+key <code>master-key</code>. The extra parameters used in <a href="#create-with"><code>create-with</code></a>
+are filled in with the default values.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -134,7 +107,9 @@
                     (create-with pwd master-key ops-limit mem-limit threads)
                 </pre>
                 <p class="doc">
-                    
+                    <p>generates a hash from the password <code>pwd</code>, using the master
+key <code>master-key</code> and a set of parameters.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -153,26 +128,12 @@
                     (derive-static-key static-key-len stored pwd ctx master-key)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#derive-static-key-">
-                    <h3 id="derive-static-key-">
-                        derive-static-key-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, Int, HydroBufRaw, (Ptr Char), Int, (Ptr Char), HydroBufRaw, Int, Int, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>derives a static key of length <code>static-key-len</code>
+for <code>stored</code> and <code>pwd</code>, using the context <code>ctx</code> and the master key
+<code>master-key</code>. The extra parameters used in
+<a href="#derive-static-key-with"><code>derive-static-key-with</code></a> are filled in with the
+default values.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -191,64 +152,10 @@
                     (derive-static-key-with static-key-len stored pwd ctx master-key ops-limit-max mem-limit-max threads-max)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#dflt-mem-limit">
-                    <h3 id="dflt-mem-limit">
-                        dflt-mem-limit
-                    </h3>
-                </a>
-                <div class="description">
-                    def
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#dflt-ops-limit">
-                    <h3 id="dflt-ops-limit">
-                        dflt-ops-limit
-                    </h3>
-                </a>
-                <div class="description">
-                    def
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#dflt-threads">
-                    <h3 id="dflt-threads">
-                        dflt-threads
-                    </h3>
-                </a>
-                <div class="description">
-                    def
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>derives a static key of length <code>static-key-len</code>
+for <code>stored</code> and <code>pwd</code>, using the context <code>ctx</code>, the master key <code>master-key</code>
+and a set of parameters.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -267,26 +174,10 @@
                     (hash-deterministic len pwd ctx master-key ops-limit)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#hash-deterministic-">
-                    <h3 id="hash-deterministic-">
-                        hash-deterministic-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, Int, (Ptr Char), Int, (Ptr Char), HydrobBufRaw, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>generates a deterministic hash of length <code>len</code> from
+the password <code>pwd</code>, using the context <code>ctx</code>, the master key <code>master-key</code>, and
+the limit of operations <code>ops-limit</code>. Only use for testing!</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -305,36 +196,18 @@
                     (keygen)
                 </pre>
                 <p class="doc">
-                    
+                    <p>generates a key for use in password hashing procedures.</p>
+
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#keygen-">
-                    <h3 id="keygen-">
-                        keygen-
+                <a class="anchor" href="#mem-limit">
+                    <h3 id="mem-limit">
+                        mem-limit
                     </h3>
                 </a>
                 <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw] ())
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#master-key-bytes">
-                    <h3 id="master-key-bytes">
-                        master-key-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
+                    def
                 </div>
                 <p class="sig">
                     Int
@@ -343,7 +216,29 @@
                     
                 </span>
                 <p class="doc">
+                    <p>is the default limit for memory.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#ops-limit">
+                    <h3 id="ops-limit">
+                        ops-limit
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
                     
+                </span>
+                <p class="doc">
+                    <p>is the default limit of operations. The higher this number,
+the slower the operation.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -362,36 +257,19 @@
                     (reencrypt stored old-master-key new-master-key)
                 </pre>
                 <p class="doc">
-                    
+                    <p>reencrypts <code>stored</code> using a new master key <code>new-master-key</code>
+from the old master key <code>old-master-key</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#reencrypt-">
-                    <h3 id="reencrypt-">
-                        reencrypt-
+                <a class="anchor" href="#threads">
+                    <h3 id="threads">
+                        threads
                     </h3>
                 </a>
                 <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, HydroBufRaw, HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#stored-bytes">
-                    <h3 id="stored-bytes">
-                        stored-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
+                    def
                 </div>
                 <p class="sig">
                     Int
@@ -400,7 +278,8 @@
                     
                 </span>
                 <p class="doc">
-                    
+                    <p>is the default number of threads.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -419,26 +298,9 @@
                     (upgrade stored master-key ops-limit mem-limit threads)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#upgrade-">
-                    <h3 id="upgrade-">
-                        upgrade-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, HydroBufRaw, Int, Int, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>upgrades <code>stored</code> with new parameters, using the master key
+<code>master-key</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -457,26 +319,10 @@
                     (verify hash pwd master-key)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#verify-">
-                    <h3 id="verify-">
-                        verify-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, (Ptr Char), Int, HydroBufRaw, Int, Int, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>verifies a hash for the password <code>pwd</code>, using the master
+key <code>master-key</code>. The extra parameters used in <a href="#verify-with"><code>verify-with</code></a>
+are filled in with the default values.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -495,7 +341,9 @@
                     (verify-with hash pwd master-key ops-limit-max mem-limit-max threads-max)
                 </pre>
                 <p class="doc">
-                    
+                    <p>verifies a hash for the password <code>pwd</code>, using the master
+key <code>master-key</code> and a set of parameters.</p>
+
                 </p>
             </div>
         </div>

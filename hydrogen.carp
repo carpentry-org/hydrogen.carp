@@ -62,10 +62,15 @@ specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-f
 (Hydro.init)
 
 (doc HydroRandom "This module contains functions for the creation of random
-numbers and handling of the random number generator.")
+numbers and handling of the random number generator.
+
+Example:
+
+```
+(HydroRandom.uniform 10)
+```")
 (defmodule HydroRandom
-  (private seed-bytes)
-  (hidden seed-bytes)
+  (doc seed-bytes "The number of bytes a seed takes up.")
   (register seed-bytes Int "hydro_random_SEEDBYTES")
 
   (doc u32 "creates an unsigned random number of 32 bit length.")
@@ -74,7 +79,7 @@ numbers and handling of the random number generator.")
 provided as argument.")
   (register uniform (Fn [Int] Int) "hydro_random_uniform")
   (private buf-)
-  (hidden buf)
+  (hidden buf-)
   (register buf- (Fn [HydroBufRaw Int] ()) "hydro_random_buf")
   (doc buf "creates a buffer containing random numbers.")
   (defn buf [n]
@@ -103,41 +108,80 @@ useful for writing tests.")
       buf))
 )
 
+(doc HydroHash "This module contains functions for hashing, both single
+and multi-part.
+
+Example:
+
+```
+(let [key (HydroHash.keygen)
+      msg (Hydro.buf \"Arbitrary data to hash\")]
+  (println* &(HydroHash.gen &msg (Hydro.context \"Examples\") &key))))
+```")
 (defmodule HydroHash
+  (private key-bytes)
+  (hidden key-bytes)
   (register key-bytes Int "hydro_hash_KEYBYTES")
+  (private bytes)
+  (hidden bytes)
   (register bytes Int "hydro_hash_BYTES")
+  (private bytes-max)
+  (hidden bytes-max)
   (register bytes-max Int "hydro_hash_BYTES_MAX")
+  (private bytes-min)
+  (hidden bytes-min)
   (register bytes-min Int "hydro_hash_BYTES_MIN")
+  (private context-bytes)
+  (hidden context-bytes)
   (register context-bytes Int "hydro_hash_CONTEXTBYTES")
 
   (register-type HydroHashState)
+  (doc state "generates a hash state.")
   (register state (Fn [] HydroHashState))
 
+  (private keygen-)
+  (hidden keygen-)
   (register keygen- (Fn [HydroBufRaw] ()) "hydro_hash_keygen")
+  (doc keygen "generates a key for use in hashing procedures.")
   (defn keygen []
     (let-do [k (Hydro.allocate key-bytes)]
       (keygen- (HydroBuf.raw &k))
       k))
 
-  (register init- (Fn [(Ref HydroHashState) key bytes] Int)
+  (private init-)
+  (hidden init-)
+  (register init- (Fn [(Ref HydroHashState) (Ptr Char) HydroBufRaw] Int)
             "hydro_hash_init")
+  (doc init "initializes a multi-part hash using the state `s`, a context `ctx`
+and a key `k`.")
   (defn init [s ctx k] (init- s ctx (HydroBuf.raw k)))
 
+  (private update-)
+  (hidden update-)
   (register update- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
             "hydro_hash_update")
+  (doc update "updates a multi-part hash using the state `s`, and a buffer
+`buf`.")
   (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
 
+  (private final-)
+  (hidden final-)
   (register final- (Fn [(Ref HydroHashState) HydroBufRaw Int] Int)
             "hydro_hash_final")
+  (doc final "finalizes a multi-part hash using the state `s`. Returns the
+final hash.")
   (defn final [s]
     (let [buf (Hydro.allocate bytes)]
       (if (= (final- s (HydroBuf.raw &buf) (HydroBuf.length &buf)) 0)
         (Maybe.Just buf)
         (Maybe.Nothing))))
 
+  (private gen-)
+  (hidden gen-)
   (register gen-
             (Fn [HydroBufRaw Int HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_hash_hash")
+  (doc gen "hashes a string `msg`, using a context `ctx` and a key `key`.")
   (defn gen [msg ctx key]
     (let [hash (Hydro.allocate bytes)]
       (if (= 0
@@ -148,21 +192,48 @@ useful for writing tests.")
         (Maybe.Nothing))))
 )
 
-(defmodule HydroKDF
-  (register context-bytes Int "hydro_kdf_CONTEXTBYTES")
-  (register key-bytes Int "hydro_kdf_KEYBYTES")
-  (register bytes-max Int "hydro_kdf_BYTES_MAX")
-  (register bytes-max Int "hydro_kdf_BYTES_MIN")
+(doc HydroKDF "This module contains functions for key derivation.
 
+Example:
+
+```
+(def context (Hydro.context \"Examples\"))
+
+(let-do [master-key (HydroKDF.keygen)]
+  (println* &(HydroKDF.derive-from-key 32 1 context &master-key))
+  (println* &(HydroKDF.derive-from-key 32 2 context &master-key))
+  (println* &(HydroKDF.derive-from-key 64 3 context &master-key))))
+```")
+(defmodule HydroKDF
+  (private context-bytes)
+  (hidden context-bytes)
+  (register context-bytes Int "hydro_kdf_CONTEXTBYTES")
+  (private key-bytes)
+  (hidden key-bytes)
+  (register key-bytes Int "hydro_kdf_KEYBYTES")
+  (private bytes-max)
+  (hidden bytes-max)
+  (register bytes-max Int "hydro_kdf_BYTES_MAX")
+  (private bytes-min)
+  (hidden bytes-min)
+  (register bytes-min Int "hydro_kdf_BYTES_MIN")
+
+  (private keygen-)
+  (hidden keygen-)
   (register keygen- (Fn [HydroBufRaw] ()) "hydro_kdf_keygen")
+  (doc keygen "generates a master key for use in key derivation procedures.")
   (defn keygen []
     (let-do [k (Hydro.allocate key-bytes)]
       (keygen- (HydroBuf.raw &k))
       k))
 
+  (private derive-from-key-)
+  (hidden derive-from-key-)
   (register derive-from-key-
             (Fn [HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_kdf_derive_from_key")
+  (doc derive-from-key "derives a subkey of length `subkey-len` with the ID `id`,
+using the context `ctx` and the master key `key`.")
   (defn derive-from-key [subkey-len id ctx key]
     (let [sub (Hydro.allocate subkey-len)]
       (if (= 0 (derive-from-key-
@@ -172,21 +243,53 @@ useful for writing tests.")
         (Maybe.Nothing))))
 )
 
+(doc HydroSecretBox "This module contains functions for encryption and decryption.
+[Probing](https://github.com/jedisct1/libhydrogen/wiki/Secret-key-encryption#probes)
+is not yet supported.
+
+Example:
+
+```
+(def context (Hydro.context \"Examples\"))
+(def msg (Hydro.buf \"Arbitrary data to encrypt\"))
+
+(let-do [key (HydroSecretBox.keygen)
+        cipher (Maybe.unsafe-from (HydroSecretBox.encrypt &msg 0
+                                                  context &key))]
+  (println*
+    &(Maybe.apply (HydroSecretBox.decrypt &cipher 0 context &key)
+                  (fn [b] (Hydro.unbuf &b)))))
+```")
 (defmodule HydroSecretBox
+  (private context-bytes)
+  (hidden context-bytes)
   (register context-bytes Int "hydro_secretbox_CONTEXTBYTES")
+  (private key-bytes)
+  (hidden key-bytes)
   (register key-bytes Int "hydro_secretbox_KEYBYTES")
+  (private header-bytes)
+  (hidden header-bytes)
   (register header-bytes Int "hydro_secretbox_HEADERBYTES")
+  (private probe-bytes)
+  (hidden probe-bytes)
   (register probe-bytes Int "hydro_secretbox_PROBEBYTES")
 
+  (private keygen-)
+  (hidden keygen-)
   (register keygen- (Fn [HydroBufRaw] ()) "hydro_secretbox_keygen")
+  (doc keygen "generates a key for use in encryption/decryption procedures.")
   (defn keygen []
     (let-do [k (Hydro.allocate key-bytes)]
       (keygen- (HydroBuf.raw &k))
       k))
 
+  (private encrypt-)
+  (hidden encrypt-)
   (register encrypt-
             (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_secretbox_encrypt")
+  (doc encrypt "encrypts a message `m` with the ID `id`, using the context
+`ctx` and key `key`.")
   (defn encrypt [m id ctx key]
     (let [c (Hydro.allocate (+ (HydroBuf.length m) header-bytes))]
       (if (= 0
@@ -197,9 +300,13 @@ useful for writing tests.")
         (Maybe.Just c)
         (Maybe.Nothing))))
 
+  (private decrypt-)
+  (hidden decrypt-)
   (register decrypt-
             (Fn [HydroBufRaw HydroBufRaw Int Int (Ptr Char) HydroBufRaw] Int)
             "hydro_secretbox_decrypt")
+  (doc decrypt "encrypts a cipher `c` with the ID `id`, using the context
+`ctx` and key `key`.")
   (defn decrypt [c id ctx key]
     (let [m (Hydro.allocate (- (HydroBuf.length c) header-bytes))]
       (if (= 0
@@ -211,28 +318,62 @@ useful for writing tests.")
         (Maybe.Nothing))))
 )
 
+(doc HydroSign "This module contains functions for signing data, both single-
+and multi-part.
+
+Example:
+
+```
+(def context (Hydro.context \"Examples\"))
+(def msg (Hydro.buf \"Test\"))
+
+(let [keypair (HydroSign.keygen)
+      signature (Maybe.unsafe-from (HydroSign.create msg context
+                                                     keypair))]
+  (println* (HydroSign.verify signature msg context keypair))))
+```")
 (defmodule HydroSign
+  (private bytes)
+  (hidden bytes)
   (register bytes Int "hydro_sign_BYTES")
+  (private context-bytes)
+  (hidden context-bytes)
   (register context-bytes Int "hydro_sign_CONTEXTBYTES")
+  (private public-key-bytes)
+  (hidden public-key-bytes)
   (register public-key-bytes Int "hydro_sign_PUBLICKEYBYTES")
+  (private secret-key-bytes)
+  (hidden secret-key-bytes)
   (register secret-key-bytes Int "hydro_sign_SECRETKEYBYTES")
+  (private seed-bytes)
+  (hidden seed-bytes)
   (register seed-bytes Int "hydro_sign_SEEDBYTES")
 
   (register-type HydroSignKeyPair)
+  (private keypair)
+  (hidden keypair)
   (register keypair (Fn [] HydroSignKeyPair))
+  (doc pk "gets a public key from a keypair.")
   (register pk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
+  (doc sk "gets a secret key from a keypair.")
   (register sk (Fn [(Ref HydroSignKeyPair)] HydroBufRaw))
 
-
+  (private keygen-)
+  (hidden keygen-)
   (register keygen- (Fn [(Ref HydroSignKeyPair)] ()) "hydro_sign_keygen")
+  (doc keygen "generates a key for use in signing procedures.")
   (defn keygen []
     (let-do [k (keypair)]
       (keygen- &k)
       k))
 
+  (private create-)
+  (hidden create-)
   (register create-
             (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_sign_create")
+  (doc create "signs a message `msg`, using the context `ctx` and the keypair
+`keypair`.")
   (defn create [msg ctx keypair]
     (let [signature (Hydro.allocate bytes)]
       (if (= 0
@@ -243,9 +384,13 @@ useful for writing tests.")
         (Maybe.Just signature)
         (Maybe.Nothing))))
 
+  (private verify-)
+  (hidden verify-)
   (register verify-
             (Fn [HydroBufRaw HydroBufRaw Int (Ptr Char) HydroBufRaw] Int)
             "hydro_sign_create")
+  (doc verify "verifies a signature `signature` for a message `msg`, using the
+context `ctx` and the keypair `keypair`.")
   (defn verify [signature msg ctx keypair]
     (= 0
       (verify-
@@ -256,48 +401,91 @@ useful for writing tests.")
   )
 
   (register-type HydroSignState)
+  (doc state "generates a state for multi-part signing.")
   (register state (Fn [] HydroSignState))
 
-  (register init (Fn [(Ref HydroSignState) ctx] Int)
+  (doc init "initializes a state for multi-part signing, using a context.")
+  (register init (Fn [(Ref HydroSignState) (Ptr Char)] Bool)
             "hydro_sign_init")
 
+  (private update-)
+  (hidden update-)
   (register update- (Fn [(Ref HydroSignState) HydroBufRaw Int] Int)
             "hydro_sign_update")
+  (doc update "updates a sign state `s` with a buffer `buf`.")
   (defn update [s buf] (update- s (HydroBuf.raw buf) (HydroBuf.length buf)))
 
+  (private final-create-)
+  (hidden final-create-)
   (register final-create- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
             "hydro_sign_final_create")
+  (doc final-create "finalizes a sign state `s` with a keypair `keypair`.
+Returns a signature.")
   (defn final-create [s keypair]
     (let-do [buf (Hydro.allocate bytes)]
       (if (= 0 (final-create- s (HydroBuf.raw &buf) (sk keypair)))
         (Maybe.Just buf)
         (Maybe.Nothing))))
 
+  (private final-verify-)
+  (hidden final-verify-)
   (register final-verify- (Fn [(Ref HydroSignState) HydroBufRaw HydroBufRaw] Int)
             "hydro_sign_final_verify")
+  (doc final-verify "finalizes a sign state `s` with a signature `signature`
+and a keypair `keypair`. Returns a boolean signifying whether we were able to
+verify the signature.")
   (defn final-verify [s signature keypair]
     (= 0 (final-verify- s (HydroBuf.raw &signature) (pk keypair))))
 )
 
+(doc HydroPWHash "This module contains functions for hashing passwords.
+
+Example:
+
+```
+(def pw \"my password\")
+
+(let [master-key (HydroPWHash.keygen)
+      hash (Maybe.unsafe-from (HydroPWHash.create pw &master-key))]
+  (println* (HydroPWHash.verify hash pw &master-key)))
+```")
 (defmodule HydroPWHash
+  (hidden context-bytes)
+  (private context-bytes)
   (register context-bytes Int "hydro_pwhash_CONTEXTBYTES")
+  (hidden master-key-bytes)
+  (private master-key-bytes)
   (register master-key-bytes Int "hydro_pwhash_MASTERKEYBYTES")
+  (hidden stored-bytes)
+  (private stored-bytes)
   (register stored-bytes Int "hydro_pwhash_STOREDBYTES")
 
-  (def dflt-ops-limit 10000)
-  (def dflt-mem-limit 0)
-  (def dflt-threads 1)
+  (doc ops-limit "is the default limit of operations. The higher this number,
+the slower the operation.")
+  (def ops-limit 10000)
+  (doc mem-limit "is the default limit for memory.")
+  (def mem-limit 0)
+  (doc threads "is the default number of threads.")
+  (def threads 1)
 
+  (private keygen-)
+  (hidden keygen-)
   (register keygen- (Fn [HydroBufRaw] ()) "hydro_pwhash_keygen")
+  (doc keygen "generates a key for use in password hashing procedures.")
   (defn keygen []
     (let-do [k (Hydro.allocate master-key-bytes)]
       (keygen- (HydroBuf.raw &k))
       k))
 
+  (private hash-deterministic-)
+  (hidden hash-deterministic-)
   (register hash-deterministic-
             (Fn [HydroBufRaw Int (Ptr Char) Int (Ptr Char) HydrobBufRaw Int]
                 Int)
             "hydro_pwhash_deterministic")
+  (doc hash-deterministic "generates a deterministic hash of length `len` from
+the password `pwd`, using the context `ctx`, the master key `master-key`, and
+the limit of operations `ops-limit`. Only use for testing!")
   (defn hash-deterministic [len pwd ctx master-key ops-limit]
     (let [h (Hydro.allocate len)]
       (if (= 0
@@ -308,9 +496,13 @@ useful for writing tests.")
         (Maybe.Just h)
         (Maybe.Nothing))))
 
+  (private create-)
+  (hidden create-)
   (register create-
             (Fn [HydroBufRaw (Ptr Char) Int HydroBufRaw Int Int Int] Int)
             "hydro_pwhash_create")
+  (doc create-with "generates a hash from the password `pwd`, using the master
+key `master-key` and a set of parameters.")
   (defn create-with [pwd master-key ops-limit mem-limit threads]
     (let [h (Hydro.allocate stored-bytes)]
       (if (= 0
@@ -320,24 +512,39 @@ useful for writing tests.")
         ))
         (Maybe.Just h)
         (Maybe.Nothing))))
+  (doc create "generates a hash from the password `pwd`, using the master
+key `master-key`. The extra parameters used in [`create-with`](#create-with)
+are filled in with the default values.")
   (defn create [pwd master-key]
-    (create-with pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
+    (create-with pwd master-key ops-limit mem-limit threads))
 
+  (private verify-)
+  (hidden verify-)
   (register verify-
             (Fn [HydroBufRaw (Ptr Char) Int HydroBufRaw Int Int Int] Int)
             "hydro_pwhash_verify")
+  (doc verify-with "verifies a hash for the password `pwd`, using the master
+key `master-key` and a set of parameters.")
   (defn verify-with [hash pwd master-key ops-limit-max mem-limit-max threads-max]
     (= 0 (verify- (HydroBuf.raw &hash) (cstr pwd) (length pwd)
                   (HydroBuf.raw master-key) ops-limit-max mem-limit-max
                   threads-max)))
+  (doc verify "verifies a hash for the password `pwd`, using the master
+key `master-key`. The extra parameters used in [`verify-with`](#verify-with)
+are filled in with the default values.")
   (defn verify [hash pwd master-key]
-    (verify-with hash pwd master-key dflt-ops-limit dflt-mem-limit dflt-threads))
+    (verify-with hash pwd master-key ops-limit mem-limit threads))
 
+  (private derive-static-key-)
+  (hidden derive-static-key-)
   (register derive-static-key-
             (Fn [HydroBufRaw Int HydroBufRaw (Ptr Char) Int (Ptr Char)
                  HydroBufRaw Int Int Int]
                  Int)
             "hydro_pwhash_derive_static_key")
+  (doc derive-static-key-with "derives a static key of length `static-key-len`
+for `stored` and `pwd`, using the context `ctx`, the master key `master-key`
+and a set of parameters.")
   (defn derive-static-key-with [static-key-len stored pwd ctx master-key
                                 ops-limit-max mem-limit-max threads-max]
     (let [static-key (Hydro.allocate static-key-len)]
@@ -347,21 +554,33 @@ useful for writing tests.")
         mem-limit-max threads-max))
         (Maybe.Just static-key)
         (Maybe.Nothing))))
+  (doc derive-static-key "derives a static key of length `static-key-len`
+for `stored` and `pwd`, using the context `ctx` and the master key
+`master-key`. The extra parameters used in
+[`derive-static-key-with`](#derive-static-key-with) are filled in with the
+default values.")
   (defn derive-static-key [static-key-len stored pwd ctx master-key]
     (derive-static-key-with
-      static-key-len stored pwd ctx master-key dflt-ops-limit dflt-mem-limit
-      dflt-threads))
+      static-key-len stored pwd ctx master-key ops-limit mem-limit threads))
 
+  (private reencrypt-)
+  (hidden reencrypt-)
   (register reencrypt- (Fn [HydroBufRaw HydroBufRaw HydroBufRaw] Int)
             "hydro_pwhash_reencrypt")
+  (doc reencrypt "reencrypts `stored` using a new master key `new-master-key`
+from the old master key `old-master-key`.")
   (defn reencrypt [stored old-master-key new-master-key]
     (if (= 0 (reencrypt- (HydroBuf.raw &stored) (HydroBuf.raw old-master-key)
                          (HydroBuf.raw new-master-key)))
       (Maybe.Just stored)
       (Maybe.Nothing)))
 
+  (private upgrade-)
+  (hidden upgrade-)
   (register upgrade- (Fn [HydroBufRaw HydroBufRaw Int Int Int] Int)
             "hydro_pwhash_upgrade")
+  (doc upgrade "upgrades `stored` with new parameters, using the master key
+`master-key`.")
   (defn upgrade [stored master-key ops-limit mem-limit threads]
     (if (= 0 (upgrade- (HydroBuf.raw &stored) (HydroBuf.raw master-key)
                        ops-limit mem-limit threads))
@@ -369,13 +588,13 @@ useful for writing tests.")
       (Maybe.Nothing)))
 )
 
-(defmodule HydroKX
-  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
-  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
-  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
-  (register psk-bytes Int "hydro_kx_PSKBYTES")
-
-  (register-type HydroKXKeyPair)
-  (register-type HydroKXSessionKeyPair)
-  (register-type HydroKXState)
-)
+;(defmodule HydroKX
+;  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
+;  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
+;  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
+;  (register psk-bytes Int "hydro_kx_PSKBYTES")
+;
+;  (register-type HydroKXKeyPair)
+;  (register-type HydroKXSessionKeyPair)
+;  (register-type HydroKXState)
+;)

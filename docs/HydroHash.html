@@ -59,83 +59,14 @@
                 HydroHash
             </h1>
             <div class="module-description">
-                
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#bytes">
-                    <h3 id="bytes">
-                        bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#bytes-max">
-                    <h3 id="bytes-max">
-                        bytes-max
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#bytes-min">
-                    <h3 id="bytes-min">
-                        bytes-min
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#context-bytes">
-                    <h3 id="context-bytes">
-                        context-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
+                <p>This module contains functions for hashing, both single
+and multi-part.</p>
+<p>Example:</p>
+<pre><code>(let [key (HydroHash.keygen)
+      msg (Hydro.buf &quot;Arbitrary data to hash&quot;)]
+  (println* &amp;(HydroHash.gen &amp;msg (Hydro.context &quot;Examples&quot;) &amp;key))))
+</code></pre>
+
             </div>
             <div class="binder">
                 <a class="anchor" href="#final">
@@ -153,26 +84,9 @@
                     (final s)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#final-">
-                    <h3 id="final-">
-                        final-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroHashState), HydroBufRaw, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>finalizes a multi-part hash using the state <code>s</code>. Returns the
+final hash.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -191,26 +105,8 @@
                     (gen msg ctx key)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#gen-">
-                    <h3 id="gen-">
-                        gen-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, Int, HydroBufRaw, Int, (Ptr Char), HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>hashes a string <code>msg</code>, using a context <code>ctx</code> and a key <code>key</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -223,51 +119,15 @@
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState), a, (Ref HydroBuf)] Int)
+                    (λ [(Ref HydroHashState), (Ptr Char), (Ref HydroBuf)] Int)
                 </p>
                 <pre class="args">
                     (init s ctx k)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#init-">
-                    <h3 id="init-">
-                        init-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroHashState), key, bytes] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#key-bytes">
-                    <h3 id="key-bytes">
-                        key-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>initializes a multi-part hash using the state <code>s</code>, a context <code>ctx</code>
+and a key <code>k</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -286,26 +146,8 @@
                     (keygen)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#keygen-">
-                    <h3 id="keygen-">
-                        keygen-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw] ())
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>generates a key for use in hashing procedures.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -324,7 +166,8 @@
                     
                 </span>
                 <p class="doc">
-                    
+                    <p>generates a hash state.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -343,26 +186,9 @@
                     (update s buf)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#update-">
-                    <h3 id="update-">
-                        update-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroHashState), HydroBufRaw, Int] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>updates a multi-part hash using the state <code>s</code>, and a buffer
+<code>buf</code>.</p>
+
                 </p>
             </div>
         </div>

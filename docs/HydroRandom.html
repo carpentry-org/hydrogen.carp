@@ -61,25 +61,29 @@
             <div class="module-description">
                 <p>This module contains functions for the creation of random
 numbers and handling of the random number generator.</p>
+<p>Example:</p>
+<pre><code>(HydroRandom.uniform 10)
+</code></pre>
 
             </div>
             <div class="binder">
-                <a class="anchor" href="#buf-">
-                    <h3 id="buf-">
-                        buf-
+                <a class="anchor" href="#buf">
+                    <h3 id="buf">
+                        buf
                     </h3>
                 </a>
                 <div class="description">
-                    external
+                    defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBufRaw, Int] ())
+                    (λ [Int] HydroBuf)
                 </p>
-                <span>
-                    
-                </span>
+                <pre class="args">
+                    (buf n)
+                </pre>
                 <p class="doc">
-                    
+                    <p>creates a buffer containing random numbers.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -144,6 +148,26 @@ states impossible.</p>
                 <p class="doc">
                     <p>reseeds the RNG; this is important to do after starting new
 threads.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#seed-bytes">
+                    <h3 id="seed-bytes">
+                        seed-bytes
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>The number of bytes a seed takes up.</p>
 
                 </p>
             </div>

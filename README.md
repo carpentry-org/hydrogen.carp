@@ -5,7 +5,7 @@
 A simple wrapper around [libhydrogen](https://github.com/jedisct1/libhydrogen)
 for Carp.
 
-Currently the library does not support key derivation.
+Currently the library does not support key exchange.
 
 ```clojure
 (load "git@github.com:carpentry-org/hydrogen.carp.git@master")

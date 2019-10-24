@@ -59,45 +59,16 @@
                 HydroKDF
             </h1>
             <div class="module-description">
-                
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#bytes-max">
-                    <h3 id="bytes-max">
-                        bytes-max
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#context-bytes">
-                    <h3 id="context-bytes">
-                        context-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
+                <p>This module contains functions for key derivation.</p>
+<p>Example:</p>
+<pre><code>(def context (Hydro.context &quot;Examples&quot;))
+
+(let-do [master-key (HydroKDF.keygen)]
+  (println* &amp;(HydroKDF.derive-from-key 32 1 context &amp;master-key))
+  (println* &amp;(HydroKDF.derive-from-key 32 2 context &amp;master-key))
+  (println* &amp;(HydroKDF.derive-from-key 64 3 context &amp;master-key))))
+</code></pre>
+
             </div>
             <div class="binder">
                 <a class="anchor" href="#derive-from-key">
@@ -115,45 +86,9 @@
                     (derive-from-key subkey-len id ctx key)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#derive-from-key-">
-                    <h3 id="derive-from-key-">
-                        derive-from-key-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw, Int, Int, (Ptr Char), HydroBufRaw] Int)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#key-bytes">
-                    <h3 id="key-bytes">
-                        key-bytes
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    Int
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>derives a subkey of length <code>subkey-len</code> with the ID <code>id</code>,
+using the context <code>ctx</code> and the master key <code>key</code>.</p>
+
                 </p>
             </div>
             <div class="binder">
@@ -172,26 +107,8 @@
                     (keygen)
                 </pre>
                 <p class="doc">
-                    
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#keygen-">
-                    <h3 id="keygen-">
-                        keygen-
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [HydroBufRaw] ())
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    
+                    <p>generates a master key for use in key derivation procedures.</p>
+
                 </p>
             </div>
         </div>
