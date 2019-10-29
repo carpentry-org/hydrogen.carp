@@ -79,7 +79,7 @@
                     defn
                 </div>
                 <p class="sig">
-                    (λ [&amp;String, (Ref HydroBuf)] (Maybe HydroBuf))
+                    (λ [&amp;String, (Ref (Array Byte))] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create pwd master-key)
@@ -101,7 +101,7 @@ are filled in with the default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [&amp;String, (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                    (λ [&amp;String, (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create-with pwd master-key ops-limit mem-limit threads)
@@ -122,7 +122,7 @@ key <code>master-key</code> and a set of parameters.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref HydroBuf), &amp;String, (Ptr Char), (Ref HydroBuf)] (Maybe HydroBuf))
+                    (λ [Int, (Ref (Array Byte)), &amp;String, (Ptr Char), (Ref (Array Byte))] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-static-key static-key-len stored pwd ctx master-key)
@@ -146,7 +146,7 @@ default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref HydroBuf), &amp;String, (Ptr Char), (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                    (λ [Int, (Ref (Array Byte)), &amp;String, (Ptr Char), (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-static-key-with static-key-len stored pwd ctx master-key ops-limit-max mem-limit-max threads-max)
@@ -168,7 +168,7 @@ and a set of parameters.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, &amp;String, (Ref HydroBuf), (Ref HydroBuf), a] (Maybe HydroBuf))
+                    (λ [Int, &amp;String, (Ref (Array Byte)), (Ref (Array Byte)), a] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (hash-deterministic len pwd ctx master-key ops-limit)
@@ -190,7 +190,7 @@ the limit of operations <code>ops-limit</code>. Only use for testing!</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] HydroBuf)
+                    (λ [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)
@@ -251,7 +251,7 @@ the slower the operation.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, (Ref HydroBuf), (Ref HydroBuf)] (Maybe HydroBuf))
+                    (λ [(Array Byte), (Ref (Array Byte)), (Ref (Array Byte))] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (reencrypt stored old-master-key new-master-key)
@@ -292,7 +292,7 @@ from the old master key <code>old-master-key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, (Ref HydroBuf), Int, Int, Int] (Maybe HydroBuf))
+                    (λ [(Array Byte), (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (upgrade stored master-key ops-limit mem-limit threads)
@@ -313,7 +313,7 @@ from the old master key <code>old-master-key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, &amp;String, (Ref HydroBuf)] Bool)
+                    (λ [(Array Byte), &amp;String, (Ref (Array Byte))] Bool)
                 </p>
                 <pre class="args">
                     (verify hash pwd master-key)
@@ -335,7 +335,7 @@ are filled in with the default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, &amp;String, (Ref HydroBuf), Int, Int, Int] Bool)
+                    (λ [(Array Byte), &amp;String, (Ref (Array Byte)), Int, Int, Int] Bool)
                 </p>
                 <pre class="args">
                     (verify-with hash pwd master-key ops-limit-max mem-limit-max threads-max)

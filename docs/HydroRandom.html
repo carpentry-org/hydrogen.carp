@@ -76,7 +76,7 @@ numbers and handling of the random number generator.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int] HydroBuf)
+                    (λ [Int] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf n)
@@ -96,7 +96,7 @@ numbers and handling of the random number generator.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref HydroBuf)] HydroBuf)
+                    (λ [Int, (Ref (Array Byte))] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf-deterministic len seed)

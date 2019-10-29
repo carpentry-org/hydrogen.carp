@@ -80,7 +80,7 @@
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, Int, (Ptr Char), (Ref HydroBuf)] (Maybe HydroBuf))
+                    (λ [Int, Int, (Ptr Char), (Ref (Array Byte))] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-from-key subkey-len id ctx key)
@@ -101,7 +101,7 @@ using the context <code>ctx</code> and the master key <code>key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] HydroBuf)
+                    (λ [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)

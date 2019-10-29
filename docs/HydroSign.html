@@ -82,7 +82,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, (Ptr Char), HydroSignKeyPair] (Maybe HydroBuf))
+                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create msg ctx keypair)
@@ -103,7 +103,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Ref HydroSignKeyPair)] (Maybe HydroBuf))
+                    (λ [(Ref HydroSignState), (Ref KeyPair)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (final-create s keypair)
@@ -124,7 +124,7 @@ Returns a signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), HydroBuf, (Ref HydroSignKeyPair)] Bool)
+                    (λ [(Ref HydroSignState), (Array Byte), (Ref KeyPair)] Bool)
                 </p>
                 <pre class="args">
                     (final-verify s signature keypair)
@@ -166,53 +166,13 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] HydroSignKeyPair)
+                    (λ [] KeyPair)
                 </p>
                 <pre class="args">
                     (keygen)
                 </pre>
                 <p class="doc">
                     <p>generates a key for use in signing procedures.</p>
-
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#pk">
-                    <h3 id="pk">
-                        pk
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignKeyPair)] HydroBufRaw)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    <p>gets a public key from a keypair.</p>
-
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#sk">
-                    <h3 id="sk">
-                        sk
-                    </h3>
-                </a>
-                <div class="description">
-                    external
-                </div>
-                <p class="sig">
-                    (λ [(Ref HydroSignKeyPair)] HydroBufRaw)
-                </p>
-                <span>
-                    
-                </span>
-                <p class="doc">
-                    <p>gets a secret key from a keypair.</p>
 
                 </p>
             </div>
@@ -246,7 +206,7 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Ref HydroBuf)] Int)
+                    (λ [(Ref HydroSignState), (Ref (Array Byte))] Int)
                 </p>
                 <pre class="args">
                     (update s buf)
@@ -266,7 +226,7 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroBuf, HydroBuf, (Ptr Char), HydroSignKeyPair] Bool)
+                    (λ [(Ref (Array Byte)), (Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] Bool)
                 </p>
                 <pre class="args">
                     (verify signature msg ctx keypair)

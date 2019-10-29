@@ -78,7 +78,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState)] (Maybe HydroBuf))
+                    (λ [(Ref HydroHashState)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (final s)
@@ -99,7 +99,7 @@ final hash.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroBuf), (Ptr Char), (Ref HydroBuf)] (Maybe HydroBuf))
+                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref (Array Byte))] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (gen msg ctx key)
@@ -119,7 +119,7 @@ final hash.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState), (Ptr Char), (Ref HydroBuf)] Int)
+                    (λ [(Ref HydroHashState), (Ptr Char), (Ref (Array Byte))] Int)
                 </p>
                 <pre class="args">
                     (init s ctx k)
@@ -140,7 +140,7 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] HydroBuf)
+                    (λ [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)
@@ -180,7 +180,7 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState), (Ref HydroBuf)] Int)
+                    (λ [(Ref HydroHashState), (Ref (Array Byte))] Int)
                 </p>
                 <pre class="args">
                     (update s buf)

@@ -25,13 +25,13 @@ handling hydrogen buffers.")
   (private erase-)
   (hidden erase-)
   (register erase- (Fn [(Ptr Byte) Int] ()) "hydro_memzero")
-  (doc erase "erases the contents of a `HydroBuf` securely.")
+  (doc erase "erases the contents of a `(Array Byte)` securely.")
   (defn erase [b] (erase- (raw b) (Array.length b)))
 
   (private eq-)
   (hidden eq-)
   (register eq- (Fn [(Ptr Byte) (Ptr Byte) Int] Bool) "hydro_equal")
-  (doc = "compares two `HydroBuf` instances in constant time. Comparing the
+  (doc = "compares two `(Array Byte)` instances in constant time. Comparing the
 same reference will lead to a failed comparison, as per the [hydrogen
 specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-for-equality).")
   (defn = [a b]
