@@ -20,6 +20,10 @@ HydroBuf Hydro_allocate(int n) {
   return res;
 }
 
+void HydroBuf_delete(HydroBuf b) {
+  free(b.buf);
+}
+
 HydroBuf Hydro_buf(String* s) {
   HydroBuf res;
   res.length = strlen(*s);

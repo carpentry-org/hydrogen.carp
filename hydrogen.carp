@@ -14,6 +14,7 @@
   (defn prn [a] (HydroBuf.str a))
   (register length (Fn [(Ref HydroBuf)] Int))
   (register raw (Fn [(Ref HydroBuf)] HydroBufRaw))
+  (register delete (Fn [HydroBuf] ()))
 )
 ; needed for printing mapped in maybe
 (defmodule HydroBufCopy
