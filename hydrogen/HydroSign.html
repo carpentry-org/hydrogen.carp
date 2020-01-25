@@ -1,0 +1,242 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                HydroSign
+            </h1>
+            <div class="module-description">
+                <p>This module contains functions for signing data, both single-
+and multi-part.</p>
+<p>Example:</p>
+<pre><code>(def context (Hydro.context &quot;Examples&quot;))
+(def msg (Hydro.buf &quot;Test&quot;))
+
+(let [keypair (HydroSign.keygen)
+      signature (Maybe.unsafe-from (HydroSign.create msg context
+                                                     keypair))]
+  (println* (HydroSign.verify signature msg context keypair))))
+</code></pre>
+
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create">
+                    <h3 id="create">
+                        create
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (create msg ctx keypair)
+                </pre>
+                <p class="doc">
+                    <p>signs a message <code>msg</code>, using the context <code>ctx</code> and the keypair
+<code>keypair</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#final-create">
+                    <h3 id="final-create">
+                        final-create
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroSignState), (Ref KeyPair)] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (final-create s keypair)
+                </pre>
+                <p class="doc">
+                    <p>finalizes a sign state <code>s</code> with a keypair <code>keypair</code>.
+Returns a signature.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#final-verify">
+                    <h3 id="final-verify">
+                        final-verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroSignState), (Array Byte), (Ref KeyPair)] Bool)
+                </p>
+                <pre class="args">
+                    (final-verify s signature keypair)
+                </pre>
+                <p class="doc">
+                    <p>finalizes a sign state <code>s</code> with a signature <code>signature</code>
+and a keypair <code>keypair</code>. Returns a boolean signifying whether we were able to
+verify the signature.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#init">
+                    <h3 id="init">
+                        init
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroSignState), (Ptr Char)] Bool)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>initializes a state for multi-part signing, using a context.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#keygen">
+                    <h3 id="keygen">
+                        keygen
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [] KeyPair)
+                </p>
+                <pre class="args">
+                    (keygen)
+                </pre>
+                <p class="doc">
+                    <p>generates a key for use in signing procedures.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#state">
+                    <h3 id="state">
+                        state
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [] HydroSignState)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>generates a state for multi-part signing.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#update">
+                    <h3 id="update">
+                        update
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroSignState), (Ref (Array Byte))] Int)
+                </p>
+                <pre class="args">
+                    (update s buf)
+                </pre>
+                <p class="doc">
+                    <p>updates a sign state <code>s</code> with a buffer <code>buf</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify">
+                    <h3 id="verify">
+                        verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref (Array Byte)), (Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] Bool)
+                </p>
+                <pre class="args">
+                    (verify signature msg ctx keypair)
+                </pre>
+                <p class="doc">
+                    <p>verifies a signature <code>signature</code> for a message <code>msg</code>, using the
+context <code>ctx</code> and the keypair <code>keypair</code>.</p>
+
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

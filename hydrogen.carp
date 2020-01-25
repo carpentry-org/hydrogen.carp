@@ -577,13 +577,67 @@ from the old master key `old-master-key`.")
       (Maybe.Nothing)))
 )
 
-;(defmodule HydroKX
-;  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
-;  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
-;  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
-;  (register psk-bytes Int "hydro_kx_PSKBYTES")
-;
-;  (register-type HydroKXKeyPair)
-;  (register-type HydroKXSessionKeyPair)
-;  (register-type HydroKXState)
-;)
+(defmodule HydroKX
+  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
+  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
+  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
+  (register psk-bytes Int "hydro_kx_PSKBYTES")
+
+  (register-type HydroKXKeyPair)
+  (register-type HydroKXSessionKeyPair)
+  ;(register-type HydroKXState)
+  (private keypair)
+  (hidden keypair)
+  (register keypair (Fn [] KeyPair))
+
+  (private pk)
+  (hidden pk)
+  (register pk (Fn [&KeyPair] (Ptr Byte)))
+
+  (private tx)
+  (hidden tx)
+  (register tx (Fn [&SessionKeyPair] (Ptr Byte)))
+
+  (private rx)
+  (hidden rx)
+  (register rx (Fn [&SessionKeyPair] (Ptr Byte)))
+
+  (register session-keypair (Fn [] SessionKeyPair))
+
+  (private keygen-)
+  (hidden keygen-)
+  (register keygen- (Fn [(Ref KeyPair)] ()) "hydro_sign_keygen")
+  (doc keygen "generates a key for use in key exchange procedures.")
+  (defn keygen []
+    (let-do [k (keypair)]
+      (keygen- &k)
+      k))
+
+  (private n-1-)
+  (hidden n-1-)
+  (register n-1-
+            (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
+            "hydro_kx_n_1")
+  (doc n-1 "generates session keys and a packet with an ephemeral public key
+to send to the server.")
+  (defn n-1 [kp]
+    (let [s (session-keypair)
+          b (Array.allocate b n-packet1-bytes)]
+      (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) (pk kp)))
+        (Maybe.Just (Pair.init (Pair.init s b) (tx &s) (rx &s)))
+        (Maybe.Nothing))))
+
+  (private n-2-)
+  (hidden n-2-)
+  (register n-2-
+            (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
+            "hydro_kx_n_2")
+  (doc n-2 "process the initial request from the client, and compute the
+session keys.")
+  (defn n-2 [kp]
+    (let [s (session-keypair)
+          b (Array.allocate b n-packet1-bytes)]
+      (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) &kp))
+        (Maybe.Just (Pair.init (tx &s) (rx &s)))
+        (Maybe.Nothing))))
+)

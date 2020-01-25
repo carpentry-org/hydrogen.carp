@@ -1,0 +1,351 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                HydroPWHash
+            </h1>
+            <div class="module-description">
+                <p>This module contains functions for hashing passwords.</p>
+<p>Example:</p>
+<pre><code>(def pw &quot;my password&quot;)
+
+(let [master-key (HydroPWHash.keygen)
+      hash (Maybe.unsafe-from (HydroPWHash.create pw &amp;master-key))]
+  (println* (HydroPWHash.verify hash pw &amp;master-key)))
+</code></pre>
+
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create">
+                    <h3 id="create">
+                        create
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [&amp;String, (Ref (Array Byte))] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (create pwd master-key)
+                </pre>
+                <p class="doc">
+                    <p>generates a hash from the password <code>pwd</code>, using the master
+key <code>master-key</code>. The extra parameters used in <a href="#create-with"><code>create-with</code></a>
+are filled in with the default values.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#create-with">
+                    <h3 id="create-with">
+                        create-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [&amp;String, (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (create-with pwd master-key ops-limit mem-limit threads)
+                </pre>
+                <p class="doc">
+                    <p>generates a hash from the password <code>pwd</code>, using the master
+key <code>master-key</code> and a set of parameters.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#derive-static-key">
+                    <h3 id="derive-static-key">
+                        derive-static-key
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, (Ref (Array Byte)), &amp;String, (Ptr Char), (Ref (Array Byte))] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (derive-static-key static-key-len stored pwd ctx master-key)
+                </pre>
+                <p class="doc">
+                    <p>derives a static key of length <code>static-key-len</code>
+for <code>stored</code> and <code>pwd</code>, using the context <code>ctx</code> and the master key
+<code>master-key</code>. The extra parameters used in
+<a href="#derive-static-key-with"><code>derive-static-key-with</code></a> are filled in with the
+default values.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#derive-static-key-with">
+                    <h3 id="derive-static-key-with">
+                        derive-static-key-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, (Ref (Array Byte)), &amp;String, (Ptr Char), (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (derive-static-key-with static-key-len stored pwd ctx master-key ops-limit-max mem-limit-max threads-max)
+                </pre>
+                <p class="doc">
+                    <p>derives a static key of length <code>static-key-len</code>
+for <code>stored</code> and <code>pwd</code>, using the context <code>ctx</code>, the master key <code>master-key</code>
+and a set of parameters.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#hash-deterministic">
+                    <h3 id="hash-deterministic">
+                        hash-deterministic
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, &amp;String, (Ref (Array Byte)), (Ref (Array Byte)), a] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (hash-deterministic len pwd ctx master-key ops-limit)
+                </pre>
+                <p class="doc">
+                    <p>generates a deterministic hash of length <code>len</code> from
+the password <code>pwd</code>, using the context <code>ctx</code>, the master key <code>master-key</code>, and
+the limit of operations <code>ops-limit</code>. Only use for testing!</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#keygen">
+                    <h3 id="keygen">
+                        keygen
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [] (Array Byte))
+                </p>
+                <pre class="args">
+                    (keygen)
+                </pre>
+                <p class="doc">
+                    <p>generates a key for use in password hashing procedures.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#mem-limit">
+                    <h3 id="mem-limit">
+                        mem-limit
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>is the default limit for memory.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#ops-limit">
+                    <h3 id="ops-limit">
+                        ops-limit
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>is the default limit of operations. The higher this number,
+the slower the operation.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#reencrypt">
+                    <h3 id="reencrypt">
+                        reencrypt
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Array Byte), (Ref (Array Byte)), (Ref (Array Byte))] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (reencrypt stored old-master-key new-master-key)
+                </pre>
+                <p class="doc">
+                    <p>reencrypts <code>stored</code> using a new master key <code>new-master-key</code>
+from the old master key <code>old-master-key</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#threads">
+                    <h3 id="threads">
+                        threads
+                    </h3>
+                </a>
+                <div class="description">
+                    def
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>is the default number of threads.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#upgrade">
+                    <h3 id="upgrade">
+                        upgrade
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Array Byte), (Ref (Array Byte)), Int, Int, Int] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (upgrade stored master-key ops-limit mem-limit threads)
+                </pre>
+                <p class="doc">
+                    <p>upgrades <code>stored</code> with new parameters, using the master key
+<code>master-key</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify">
+                    <h3 id="verify">
+                        verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Array Byte), &amp;String, (Ref (Array Byte))] Bool)
+                </p>
+                <pre class="args">
+                    (verify hash pwd master-key)
+                </pre>
+                <p class="doc">
+                    <p>verifies a hash for the password <code>pwd</code>, using the master
+key <code>master-key</code>. The extra parameters used in <a href="#verify-with"><code>verify-with</code></a>
+are filled in with the default values.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify-with">
+                    <h3 id="verify-with">
+                        verify-with
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Array Byte), &amp;String, (Ref (Array Byte)), Int, Int, Int] Bool)
+                </p>
+                <pre class="args">
+                    (verify-with hash pwd master-key ops-limit-max mem-limit-max threads-max)
+                </pre>
+                <p class="doc">
+                    <p>verifies a hash for the password <code>pwd</code>, using the master
+key <code>master-key</code> and a set of parameters.</p>
+
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

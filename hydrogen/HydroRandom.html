@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                HydroRandom
+            </h1>
+            <div class="module-description">
+                <p>This module contains functions for the creation of random
+numbers and handling of the random number generator.</p>
+<p>Example:</p>
+<pre><code>(HydroRandom.uniform 10)
+</code></pre>
+
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#buf">
+                    <h3 id="buf">
+                        buf
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int] (Array Byte))
+                </p>
+                <pre class="args">
+                    (buf n)
+                </pre>
+                <p class="doc">
+                    <p>creates a buffer containing random numbers.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#buf-deterministic">
+                    <h3 id="buf-deterministic">
+                        buf-deterministic
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [Int, (Ref (Array Byte))] (Array Byte))
+                </p>
+                <pre class="args">
+                    (buf-deterministic len seed)
+                </pre>
+                <p class="doc">
+                    <p>creates a buffer containing <code>len</code> numbers
+indistinguishable from random bytes without knowing <code>seed</code>. For a given seed,
+this function will always output the same sequence. This function is mainly
+useful for writing tests.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#ratchet">
+                    <h3 id="ratchet">
+                        ratchet
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [] ())
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>erases part of the RNG state to make recovering previous RNG
+states impossible.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#reseed">
+                    <h3 id="reseed">
+                        reseed
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [] ())
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>reseeds the RNG; this is important to do after starting new
+threads.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#seed-bytes">
+                    <h3 id="seed-bytes">
+                        seed-bytes
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    Int
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>The number of bytes a seed takes up.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#u32">
+                    <h3 id="u32">
+                        u32
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>creates an unsigned random number of 32 bit length.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#uniform">
+                    <h3 id="uniform">
+                        uniform
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [Int] Int)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>creates a uniform random number from 0 to an upper limit
+provided as argument.</p>
+
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

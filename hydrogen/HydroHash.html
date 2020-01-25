@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="http://github.com/carp-lang/Carp">
+                    <img src="logo.png">
+                </a>
+                <div class="title">
+                    Hydrogen
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <a href="Hydro.html">
+                                Hydro
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroRandom.html">
+                                HydroRandom
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroHash.html">
+                                HydroHash
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroKDF.html">
+                                HydroKDF
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSecretBox.html">
+                                HydroSecretBox
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroSign.html">
+                                HydroSign
+                            </a>
+                        </li>
+                        <li>
+                            <a href="HydroPWHash.html">
+                                HydroPWHash
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h1>
+                HydroHash
+            </h1>
+            <div class="module-description">
+                <p>This module contains functions for hashing, both single
+and multi-part.</p>
+<p>Example:</p>
+<pre><code>(let [key (HydroHash.keygen)
+      msg (Hydro.buf &quot;Arbitrary data to hash&quot;)]
+  (println* &amp;(HydroHash.gen &amp;msg (Hydro.context &quot;Examples&quot;) &amp;key))))
+</code></pre>
+
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#final">
+                    <h3 id="final">
+                        final
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroHashState)] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (final s)
+                </pre>
+                <p class="doc">
+                    <p>finalizes a multi-part hash using the state <code>s</code>. Returns the
+final hash.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#gen">
+                    <h3 id="gen">
+                        gen
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref (Array Byte))] (Maybe (Array Byte)))
+                </p>
+                <pre class="args">
+                    (gen msg ctx key)
+                </pre>
+                <p class="doc">
+                    <p>hashes a string <code>msg</code>, using a context <code>ctx</code> and a key <code>key</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#init">
+                    <h3 id="init">
+                        init
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroHashState), (Ptr Char), (Ref (Array Byte))] Int)
+                </p>
+                <pre class="args">
+                    (init s ctx k)
+                </pre>
+                <p class="doc">
+                    <p>initializes a multi-part hash using the state <code>s</code>, a context <code>ctx</code>
+and a key <code>k</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#keygen">
+                    <h3 id="keygen">
+                        keygen
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [] (Array Byte))
+                </p>
+                <pre class="args">
+                    (keygen)
+                </pre>
+                <p class="doc">
+                    <p>generates a key for use in hashing procedures.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#state">
+                    <h3 id="state">
+                        state
+                    </h3>
+                </a>
+                <div class="description">
+                    external
+                </div>
+                <p class="sig">
+                    (λ [] HydroHashState)
+                </p>
+                <span>
+                    
+                </span>
+                <p class="doc">
+                    <p>generates a hash state.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#update">
+                    <h3 id="update">
+                        update
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroHashState), (Ref (Array Byte))] Int)
+                </p>
+                <pre class="args">
+                    (update s buf)
+                </pre>
+                <p class="doc">
+                    <p>updates a multi-part hash using the state <code>s</code>, and a buffer
+<code>buf</code>.</p>
+
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
