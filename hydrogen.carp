@@ -577,6 +577,11 @@ from the old master key `old-master-key`.")
       (Maybe.Nothing)))
 )
 
+(doc HydroPWHash "This module contains functions for hashing passwords.
+
+It has not been tested very well (contributions very welcome!), and as of now
+I’d **recommend against using it**. It was published for user testing purposes,
+but this should not be taken as an endorsement to use it.")
 (defmodule HydroKX
   (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
   (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
@@ -585,7 +590,7 @@ from the old master key `old-master-key`.")
 
   (register-type HydroKXKeyPair)
   (register-type HydroKXSessionKeyPair)
-  ;(register-type HydroKXState)
+  (register-type HydroKXState)
   (private keypair)
   (hidden keypair)
   (register keypair (Fn [] KeyPair))
@@ -619,12 +624,14 @@ from the old master key `old-master-key`.")
             (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
             "hydro_kx_n_1")
   (doc n-1 "generates session keys and a packet with an ephemeral public key
-to send to the server.")
+to send to the server.
+
+If all goes well, it returns [`packet1`, `tx`, rx].")
   (defn n-1 [kp]
     (let [s (session-keypair)
-          b (Array.allocate b n-packet1-bytes)]
+          b (Array.allocate n-packet1-bytes)]
       (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) (pk kp)))
-        (Maybe.Just (Pair.init (Pair.init s b) (tx &s) (rx &s)))
+        (Maybe.Just [b (tx &s) (rx &s)])
         (Maybe.Nothing))))
 
   (private n-2-)
@@ -632,12 +639,63 @@ to send to the server.")
   (register n-2-
             (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
             "hydro_kx_n_2")
-  (doc n-2 "process the initial request from the client, and compute the
-session keys.")
+  (doc n-2 "process the initial request from the client, and computes the
+session keys.
+
+If all goes well, it returns a pair of (`tx`, `rx`).")
   (defn n-2 [kp]
     (let [s (session-keypair)
-          b (Array.allocate b n-packet1-bytes)]
+          b (Array.allocate n-packet2-bytes)]
       (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) &kp))
         (Maybe.Just (Pair.init (tx &s) (rx &s)))
         (Maybe.Nothing))))
+
+    (private kk-1-)
+    (hidden kk-1-)
+    (register kk-1-
+              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
+              "hydro_kx_kk_1")
+    (doc kk-1 "s called by a client initiating a connection. It initializes the
+state, computes an ephemeral key pair, and creates the first packet to send to
+the server.
+
+If all goes well, it returns a pair of (`state`, `packet1`).")
+    (defn kk-1 [skp ckp]
+      (let [st (state)
+            b (Array.allocate k-packet1-bytes)]
+      (if (= 0 (kk-1- &st (Hydro.raw &b) (pk skp) &ckp))
+        (Maybe.Just (Pair.init st b))
+        (Maybe.Nothing))))
+
+    (private kk-2-)
+    (hidden kk-2-)
+    (register kk-2-
+              (Fn [&SessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
+              "hydro_kx_kk_2")
+    (doc kk-2 "has to be called by the server after a client request has been
+received. It validates the request, computes an ephemeral key pair and creates
+the packet to send to the client.
+
+If all goes well, it returns [`packet2`, `tx`, `rx].")
+    (defn kk-2 [skp ckp p]
+      (let [s (session-keypair)
+            b (Array.allocate k-packet2-bytes)]
+      (if (= 0 (kk-2- &s (Hydro.raw &b) (Hydro.raw &p) (pk ckp) &skp))
+        (Maybe.Just [b (tx &s) (rx &s)])
+        (Maybe.Nothing))))
+
+    (private kk-3-)
+    (hidden kk-3-)
+    (register kk-3-
+              (Fn [&HydroKXState &SessionKeyPair (Ptr Byte) (Ref KeyPair)] Int)
+              "hydro_kx_kk_3")
+    (doc kk-3 "has to be called by the client after having received the packet
+from the server. It validates the packet and computes the shared session key.
+
+If all goes well, it returns a pair of (`tx`, `rx`).")
+    (defn kk-3 [st p2 kp]
+      (let [s (session-keypair)]
+        (if (= 0 (kk-3- &st &s (Hydro.raw &p2) &kp))
+          (Maybe.Just (Pair.init (tx &s) (rx &s)))
+          (Maybe.Nothing))))
 )

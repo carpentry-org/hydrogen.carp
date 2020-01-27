@@ -5,6 +5,7 @@
 
 typedef hydro_hash_state HydroHashState;
 typedef hydro_sign_state HydroSignState;
+typedef hydro_kx_state HydroKXState;
 
 uint8_t* Hydro_raw(Array* buf) {
   return buf->data;
