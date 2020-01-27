@@ -587,6 +587,12 @@ but this should not be taken as an endorsement to use it.")
   (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
   (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
   (register psk-bytes Int "hydro_kx_PSKBYTES")
+  (register n-packet1-bytes Int "hydro_kx_n_PACKET1BYTES")
+  (register k-packet1-bytes Int "hydro_kx_kk_PACKET1BYTES")
+  (register x-packet1-bytes Int "hydro_kx_xx_PACKET1BYTES")
+  (register n-packet2-bytes Int "hydro_kx_n_PACKET2BYTES")
+  (register k-packet2-bytes Int "hydro_kx_kk_PACKET2BYTES")
+  (register x-packet2-bytes Int "hydro_kx_xx_PACKET2BYTES")
 
   (register-type HydroKXKeyPair)
   (register-type HydroKXSessionKeyPair)
@@ -601,13 +607,14 @@ but this should not be taken as an endorsement to use it.")
 
   (private tx)
   (hidden tx)
-  (register tx (Fn [&SessionKeyPair] (Ptr Byte)))
+  (register tx (Fn [&HydroKXSessionKeyPair] (Array Byte)))
 
   (private rx)
   (hidden rx)
-  (register rx (Fn [&SessionKeyPair] (Ptr Byte)))
+  (register rx (Fn [&HydroKXSessionKeyPair] (Array Byte)))
 
-  (register session-keypair (Fn [] SessionKeyPair))
+  (register session-keypair (Fn [] HydroKXSessionKeyPair))
+  (register state (Fn [] HydroKXState))
 
   (private keygen-)
   (hidden keygen-)
@@ -621,7 +628,7 @@ but this should not be taken as an endorsement to use it.")
   (private n-1-)
   (hidden n-1-)
   (register n-1-
-            (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
+            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
             "hydro_kx_n_1")
   (doc n-1 "generates session keys and a packet with an ephemeral public key
 to send to the server.
@@ -630,14 +637,14 @@ If all goes well, it returns [`packet1`, `tx`, rx].")
   (defn n-1 [kp]
     (let [s (session-keypair)
           b (Array.allocate n-packet1-bytes)]
-      (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) (pk kp)))
+      (if (= 0 (n-1- &s (Hydro.raw &b) (NULL) (pk kp)))
         (Maybe.Just [b (tx &s) (rx &s)])
         (Maybe.Nothing))))
 
   (private n-2-)
   (hidden n-2-)
   (register n-2-
-            (Fn [(Ref SessionKeyPair) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
+            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
             "hydro_kx_n_2")
   (doc n-2 "process the initial request from the client, and computes the
 session keys.
@@ -646,7 +653,7 @@ If all goes well, it returns a pair of (`tx`, `rx`).")
   (defn n-2 [kp]
     (let [s (session-keypair)
           b (Array.allocate n-packet2-bytes)]
-      (if (= 0 (n-1- (Hydro.raw &s) (Hydro.raw &b) (NULL) &kp))
+      (if (= 0 (n-2- &s (Hydro.raw &b) (NULL) &kp))
         (Maybe.Just (Pair.init (tx &s) (rx &s)))
         (Maybe.Nothing))))
 
@@ -670,7 +677,7 @@ If all goes well, it returns a pair of (`state`, `packet1`).")
     (private kk-2-)
     (hidden kk-2-)
     (register kk-2-
-              (Fn [&SessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
+              (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) (Ref KeyPair)] Int)
               "hydro_kx_kk_2")
     (doc kk-2 "has to be called by the server after a client request has been
 received. It validates the request, computes an ephemeral key pair and creates
@@ -687,7 +694,7 @@ If all goes well, it returns [`packet2`, `tx`, `rx].")
     (private kk-3-)
     (hidden kk-3-)
     (register kk-3-
-              (Fn [&HydroKXState &SessionKeyPair (Ptr Byte) (Ref KeyPair)] Int)
+              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ref KeyPair)] Int)
               "hydro_kx_kk_3")
     (doc kk-3 "has to be called by the client after having received the packet
 from the server. It validates the packet and computes the shared session key.
