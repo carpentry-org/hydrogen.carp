@@ -52,6 +52,11 @@
                                 HydroPWHash
                             </a>
                         </li>
+                        <li>
+                            <a href="HydroKX.html">
+                                HydroKX
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -82,7 +87,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] (Maybe (Array Byte)))
+                    (λ [(Ref (Array Byte) a), (Ptr Char), (Ref HydroSignKeyPair b)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create msg ctx keypair)
@@ -103,7 +108,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Ref KeyPair)] (Maybe (Array Byte)))
+                    (λ [(Ref HydroSignState a), (Ref HydroSignKeyPair b)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (final-create s keypair)
@@ -124,7 +129,7 @@ Returns a signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Array Byte), (Ref KeyPair)] Bool)
+                    (λ [(Ref HydroSignState a), (Array Byte), (Ref HydroSignKeyPair b)] Bool)
                 </p>
                 <pre class="args">
                     (final-verify s signature keypair)
@@ -146,7 +151,7 @@ verify the signature.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Ptr Char)] Bool)
+                    (λ [(Ref HydroSignState a), (Ptr Char)] Bool)
                 </p>
                 <span>
                     
@@ -166,7 +171,7 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] KeyPair)
+                    (λ [] HydroSignKeyPair)
                 </p>
                 <pre class="args">
                     (keygen)
@@ -206,7 +211,7 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroSignState), (Ref (Array Byte))] Int)
+                    (λ [(Ref HydroSignState a), (Ref (Array Byte) b)] Int)
                 </p>
                 <pre class="args">
                     (update s buf)
@@ -226,7 +231,7 @@ verify the signature.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte)), (Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] Bool)
+                    (λ [(Ref (Array Byte) a), (Ref (Array Byte) b), (Ptr Char), (Ref HydroSignKeyPair c)] Bool)
                 </p>
                 <pre class="args">
                     (verify signature msg ctx keypair)

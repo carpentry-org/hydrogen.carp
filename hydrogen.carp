@@ -137,7 +137,7 @@ Example:
 
   (private init-)
   (hidden init-)
-  (register init- (Fn [(Ref HydroHashState) (Ptr Char) (Ptr Byte)] Int)
+  (register init- (Fn [&HydroHashState (Ptr Char) (Ptr Byte)] Int)
             "hydro_hash_init")
   (doc init "initializes a multi-part hash using the state `s`, a context `ctx`
 and a key `k`.")
@@ -145,7 +145,7 @@ and a key `k`.")
 
   (private update-)
   (hidden update-)
-  (register update- (Fn [(Ref HydroHashState) (Ptr Byte) Int] Int)
+  (register update- (Fn [&HydroHashState (Ptr Byte) Int] Int)
             "hydro_hash_update")
   (doc update "updates a multi-part hash using the state `s`, and a buffer
 `buf`.")
@@ -153,7 +153,7 @@ and a key `k`.")
 
   (private final-)
   (hidden final-)
-  (register final- (Fn [(Ref HydroHashState) (Ptr Byte) Int] Int)
+  (register final- (Fn [&HydroHashState (Ptr Byte) Int] Int)
             "hydro_hash_final")
   (doc final "finalizes a multi-part hash using the state `s`. Returns the
 final hash.")
@@ -336,20 +336,20 @@ Example:
   (hidden seed-bytes)
   (register seed-bytes Int "hydro_sign_SEEDBYTES")
 
-  (register-type KeyPair)
+  (register-type HydroSignKeyPair)
   (private keypair)
   (hidden keypair)
-  (register keypair (Fn [] KeyPair))
+  (register keypair (Fn [] HydroSignKeyPair))
   (private pk)
   (hidden pk)
-  (register pk (Fn [&KeyPair] (Ptr Byte)))
+  (register pk (Fn [&HydroSignKeyPair] (Ptr Byte)))
   (private sk)
   (hidden sk)
-  (register sk (Fn [&KeyPair] (Ptr Byte)))
+  (register sk (Fn [&HydroSignKeyPair] (Ptr Byte)))
 
   (private keygen-)
   (hidden keygen-)
-  (register keygen- (Fn [(Ref KeyPair)] ()) "hydro_sign_keygen")
+  (register keygen- (Fn [&HydroSignKeyPair] ()) "hydro_sign_keygen")
   (doc keygen "generates a key for use in signing procedures.")
   (defn keygen []
     (let-do [k (keypair)]
@@ -394,19 +394,19 @@ context `ctx` and the keypair `keypair`.")
   (register state (Fn [] HydroSignState))
 
   (doc init "initializes a state for multi-part signing, using a context.")
-  (register init (Fn [(Ref HydroSignState) (Ptr Char)] Bool)
+  (register init (Fn [&HydroSignState (Ptr Char)] Bool)
             "hydro_sign_init")
 
   (private update-)
   (hidden update-)
-  (register update- (Fn [(Ref HydroSignState) (Ptr Byte) Int] Int)
+  (register update- (Fn [&HydroSignState (Ptr Byte) Int] Int)
             "hydro_sign_update")
   (doc update "updates a sign state `s` with a buffer `buf`.")
   (defn update [s buf] (update- s (Hydro.raw buf) (Array.length buf)))
 
   (private final-create-)
   (hidden final-create-)
-  (register final-create- (Fn [(Ref HydroSignState) (Ptr Byte) (Ptr Byte)] Int)
+  (register final-create- (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
             "hydro_sign_final_create")
   (doc final-create "finalizes a sign state `s` with a keypair `keypair`.
 Returns a signature.")
@@ -418,7 +418,7 @@ Returns a signature.")
 
   (private final-verify-)
   (hidden final-verify-)
-  (register final-verify- (Fn [(Ref HydroSignState) (Ptr Byte) (Ptr Byte)] Int)
+  (register final-verify- (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
             "hydro_sign_final_verify")
   (doc final-verify "finalizes a sign state `s` with a signature `signature`
 and a keypair `keypair`. Returns a boolean signifying whether we were able to
@@ -577,13 +577,205 @@ from the old master key `old-master-key`.")
       (Maybe.Nothing)))
 )
 
-;(defmodule HydroKX
-;  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
-;  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
-;  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
-;  (register psk-bytes Int "hydro_kx_PSKBYTES")
-;
-;  (register-type HydroKXKeyPair)
-;  (register-type HydroKXSessionKeyPair)
-;  (register-type HydroKXState)
-;)
+(doc HydroKX "This module contains functions for key exchange.
+
+It has not been tested very well (contributions very welcome!), and as of now
+I’d **recommend against using it**. It was published for user testing purposes,
+but this should not be taken as an endorsement to use it.")
+(defmodule HydroKX
+  (register session-key-bytes Int "hydro_kx_SESSIONKEYBYTES")
+  (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
+  (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
+  (register psk-bytes Int "hydro_kx_PSKBYTES")
+  (register n-packet1-bytes Int "hydro_kx_N_PACKET1BYTES")
+  (register k-packet1-bytes Int "hydro_kx_KK_PACKET1BYTES")
+  (register x-packet1-bytes Int "hydro_kx_XX_PACKET1BYTES")
+  (register k-packet2-bytes Int "hydro_kx_KK_PACKET2BYTES")
+  (register x-packet2-bytes Int "hydro_kx_XX_PACKET2BYTES")
+  (register x-packet3-bytes Int "hydro_kx_XX_PACKET3BYTES")
+
+  (register-type HydroKXKeyPair)
+  (register-type HydroKXSessionKeyPair)
+  (register-type HydroKXState)
+  (private keypair)
+  (hidden keypair)
+  (register keypair (Fn [] HydroKXKeyPair))
+
+  (private pk)
+  (hidden pk)
+  (register pk (Fn [&HydroKXKeyPair] (Ptr Byte)))
+
+  (private tx)
+  (hidden tx)
+  (register tx (Fn [&HydroKXSessionKeyPair] (Array Byte)))
+
+  (private rx)
+  (hidden rx)
+  (register rx (Fn [&HydroKXSessionKeyPair] (Array Byte)))
+
+  (register session-keypair (Fn [] HydroKXSessionKeyPair))
+  (register state (Fn [] HydroKXState))
+
+  (private keygen-)
+  (hidden keygen-)
+  (register keygen- (Fn [&HydroKXKeyPair] ()) "hydro_kx_keygen")
+  (doc keygen "generates a key for use in key exchange procedures.")
+  (defn keygen []
+    (let-do [k (keypair)]
+      (keygen- &k)
+      k))
+
+  (private n-1-)
+  (hidden n-1-)
+  (register n-1-
+            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
+            "hydro_kx_n_1")
+  (doc n-1 "generates session keys and a packet with an ephemeral public key
+to send to the server.
+
+If all goes well, it returns [`packet1`, `tx`, rx].")
+  (defn n-1 [kp]
+    (let [s (session-keypair)
+          b (Array.allocate n-packet1-bytes)]
+      (if (= 0 (n-1- &s (Hydro.raw &b) NULL (pk kp)))
+        (Maybe.Just [b (tx &s) (rx &s)])
+        (Maybe.Nothing))))
+
+  (private n-2-)
+  (hidden n-2-)
+  (register n-2-
+            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) &HydroKXKeyPair]
+                Int)
+            "hydro_kx_n_2")
+  (doc n-2 "process the initial request from the client, and computes the
+session keys.
+
+If all goes well, it returns a pair of (`tx`, `rx`).")
+  (defn n-2 [kp p]
+    (let [s (session-keypair)]
+      (if (= 0 (n-2- &s p NULL &kp))
+        (Maybe.Just (Pair.init (tx &s) (rx &s)))
+        (Maybe.Nothing))))
+
+    (private kk-1-)
+    (hidden kk-1-)
+    (register kk-1-
+              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
+              "hydro_kx_kk_1")
+    (doc kk-1 "s called by a client initiating a connection. It initializes the
+state, computes an ephemeral key pair, and creates the first packet to send to
+the server.
+
+If all goes well, it returns a pair of (`state`, `packet1`).")
+    (defn kk-1 [skp ckp]
+      (let [st (state)
+            b (Array.allocate k-packet1-bytes)]
+      (if (= 0 (kk-1- &st (Hydro.raw &b) (pk skp) &ckp))
+        (Maybe.Just (Pair.init st b))
+        (Maybe.Nothing))))
+
+    (private kk-2-)
+    (hidden kk-2-)
+    (register kk-2-
+              (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)
+                   &HydroKXKeyPair] Int)
+              "hydro_kx_kk_2")
+    (doc kk-2 "has to be called by the server after a client request has been
+received. It validates the request, computes an ephemeral key pair and creates
+the packet to send to the client.
+
+If all goes well, it returns [`packet2`, `tx`, `rx].")
+    (defn kk-2 [skp ckp p]
+      (let [s (session-keypair)
+            b (Array.allocate k-packet2-bytes)]
+      (if (= 0 (kk-2- &s (Hydro.raw &b) (Hydro.raw &p) (pk ckp) &skp))
+        (Maybe.Just [b (tx &s) (rx &s)])
+        (Maybe.Nothing))))
+
+    (private kk-3-)
+    (hidden kk-3-)
+    (register kk-3-
+              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte)
+                   &HydroKXKeyPair] Int)
+              "hydro_kx_kk_3")
+    (doc kk-3 "has to be called by the client after having received the packet
+from the server. It validates the packet and computes the shared session key.
+
+If all goes well, it returns a pair of (`tx`, `rx`).")
+    (defn kk-3 [st p2 kp]
+      (let [s (session-keypair)]
+        (if (= 0 (kk-3- &st &s (Hydro.raw &p2) &kp))
+          (Maybe.Just (Pair.init (tx &s) (rx &s)))
+          (Maybe.Nothing))))
+
+    (private xx-1-)
+    (hidden xx-1-)
+    (register xx-1-
+              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte)]
+                  Int)
+              "hydro_kx_xx_1")
+    (doc xx-1 "s called by a client initiating a connection. It initializes the
+state, computes an ephemeral key pair, and creates the first packet to send to
+the server.
+
+If all goes well, it returns a pair of (`state`, `packet1`).")
+    (defn xx-1 []
+      (let [st (state)
+            b (Array.allocate x-packet1-bytes)]
+      (if (= 0 (xx-1- &st (Hydro.raw &b) NULL))
+        (Maybe.Just (Pair.init st b))
+        (Maybe.Nothing))))
+
+    (private xx-2-)
+    (hidden xx-2-)
+    (register xx-2-
+              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) (Ptr Byte)
+                   &HydroKXKeyPair] Int)
+              "hydro_kx_xx_2")
+    (doc xx-2 "has to be called by the server after a client request has been
+received. It validates the request, and creates the packet to send to the
+client.
+
+If all goes well, it returns (`state`, `packet2`).")
+    (defn xx-2 [skp p]
+      (let [st (state)
+            b (Array.allocate x-packet2-bytes)]
+      (if (= 0 (xx-2- &st (Hydro.raw &b) (Hydro.raw &p) NULL &skp))
+        (Maybe.Just (Pair.init st b))
+        (Maybe.Nothing))))
+
+    (private xx-3-)
+    (hidden xx-3-)
+    (register xx-3-
+              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte)
+                   (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
+              "hydro_kx_xx_3")
+    (doc xx-3 "has to be called by the client after having received the packet
+from the server. It validates the packet, creates another packet for the
+server, and computes the shared session key.
+
+If all goes well, it returns [`packet3`, `tx`, `rx`].")
+    (defn xx-3 [st p2 kp]
+      (let [s (session-keypair)
+            b (Array.allocate x-packet3-bytes)]
+        (if (= 0 (xx-3- &st &s (Hydro.raw &b) NULL (Hydro.raw &p2) NULL &kp))
+          (Maybe.Just [b (tx &s) (rx &s)])
+          (Maybe.Nothing))))
+
+    (private xx-4-)
+    (hidden xx-4-)
+    (register xx-4-
+              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte)
+                   (Ptr Byte)] Int)
+              "hydro_kx_xx_4")
+    (doc xx-4 "has to be called by the server after having received the final
+packet from the client. It validates the packet, and computes the shared
+session key.
+
+If all goes well, it returns a pair of (`tx`, `rx`).")
+    (defn xx-4 [st p3]
+      (let [s (session-keypair)]
+        (if (= 0 (xx-4- &st &s NULL (Hydro.raw &p3) NULL))
+          (Maybe.Just (Pair.init (tx &s) (rx &s)))
+          (Maybe.Nothing))))
+)

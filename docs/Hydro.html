@@ -52,6 +52,11 @@
                                 HydroPWHash
                             </a>
                         </li>
+                        <li>
+                            <a href="HydroKX.html">
+                                HydroKX
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -73,7 +78,7 @@ handling hydrogen buffers.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte)), (Ref (Array Byte))] Bool)
+                    (λ [(Ref (Array Byte) a), (Ref (Array Byte) b)] Bool)
                 </p>
                 <pre class="args">
                     (= a b)
@@ -95,7 +100,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [&amp;String] (Array Byte))
+                    (λ [(Ref String a)] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf s)
@@ -115,7 +120,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [&amp;String] (Ptr Char))
+                    (λ [(Ref String a)] (Ptr Char))
                 </p>
                 <pre class="args">
                     (context s)
@@ -135,7 +140,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte))] ())
+                    (λ [(Ref (Array Byte) a)] ())
                 </p>
                 <pre class="args">
                     (erase b)
@@ -155,7 +160,7 @@ specs</a>.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte))] (Ptr Byte))
+                    (λ [(Ref (Array Byte) a)] (Ptr Byte))
                 </p>
                 <span>
                     
@@ -174,7 +179,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte))] String)
+                    (λ [(Ref (Array Byte) a)] String)
                 </p>
                 <pre class="args">
                     (unbuf a)

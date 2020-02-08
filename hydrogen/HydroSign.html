@@ -52,65 +52,87 @@
                                 HydroPWHash
                             </a>
                         </li>
-                        <li>
-                            <a href="HydroKX.html">
-                                HydroKX
-                            </a>
-                        </li>
                     </ul>
                 </div>
             </div>
             <h1>
-                HydroHash
+                HydroSign
             </h1>
             <div class="module-description">
-                <p>This module contains functions for hashing, both single
+                <p>This module contains functions for signing data, both single-
 and multi-part.</p>
 <p>Example:</p>
-<pre><code>(let [key (HydroHash.keygen)
-      msg (Hydro.buf &quot;Arbitrary data to hash&quot;)]
-  (println* &amp;(HydroHash.gen &amp;msg (Hydro.context &quot;Examples&quot;) &amp;key))))
+<pre><code>(def context (Hydro.context &quot;Examples&quot;))
+(def msg (Hydro.buf &quot;Test&quot;))
+
+(let [keypair (HydroSign.keygen)
+      signature (Maybe.unsafe-from (HydroSign.create msg context
+                                                     keypair))]
+  (println* (HydroSign.verify signature msg context keypair))))
 </code></pre>
 
             </div>
             <div class="binder">
-                <a class="anchor" href="#final">
-                    <h3 id="final">
-                        final
+                <a class="anchor" href="#create">
+                    <h3 id="create">
+                        create
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a)] (Maybe (Array Byte)))
+                    (λ [(Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
-                    (final s)
+                    (create msg ctx keypair)
                 </pre>
                 <p class="doc">
-                    <p>finalizes a multi-part hash using the state <code>s</code>. Returns the
-final hash.</p>
+                    <p>signs a message <code>msg</code>, using the context <code>ctx</code> and the keypair
+<code>keypair</code>.</p>
 
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#gen">
-                    <h3 id="gen">
-                        gen
+                <a class="anchor" href="#final-create">
+                    <h3 id="final-create">
+                        final-create
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a), (Ptr Char), (Ref (Array Byte) b)] (Maybe (Array Byte)))
+                    (λ [(Ref HydroSignState), (Ref KeyPair)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
-                    (gen msg ctx key)
+                    (final-create s keypair)
                 </pre>
                 <p class="doc">
-                    <p>hashes a string <code>msg</code>, using a context <code>ctx</code> and a key <code>key</code>.</p>
+                    <p>finalizes a sign state <code>s</code> with a keypair <code>keypair</code>.
+Returns a signature.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#final-verify">
+                    <h3 id="final-verify">
+                        final-verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref HydroSignState), (Array Byte), (Ref KeyPair)] Bool)
+                </p>
+                <pre class="args">
+                    (final-verify s signature keypair)
+                </pre>
+                <p class="doc">
+                    <p>finalizes a sign state <code>s</code> with a signature <code>signature</code>
+and a keypair <code>keypair</code>. Returns a boolean signifying whether we were able to
+verify the signature.</p>
 
                 </p>
             </div>
@@ -121,17 +143,16 @@ final hash.</p>
                     </h3>
                 </a>
                 <div class="description">
-                    defn
+                    external
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ptr Char), (Ref (Array Byte) b)] Int)
+                    (λ [(Ref HydroSignState), (Ptr Char)] Bool)
                 </p>
-                <pre class="args">
-                    (init s ctx k)
-                </pre>
+                <span>
+                    
+                </span>
                 <p class="doc">
-                    <p>initializes a multi-part hash using the state <code>s</code>, a context <code>ctx</code>
-and a key <code>k</code>.</p>
+                    <p>initializes a state for multi-part signing, using a context.</p>
 
                 </p>
             </div>
@@ -145,13 +166,13 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Array Byte))
+                    (λ [] KeyPair)
                 </p>
                 <pre class="args">
                     (keygen)
                 </pre>
                 <p class="doc">
-                    <p>generates a key for use in hashing procedures.</p>
+                    <p>generates a key for use in signing procedures.</p>
 
                 </p>
             </div>
@@ -165,13 +186,13 @@ and a key <code>k</code>.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [] HydroHashState)
+                    (λ [] HydroSignState)
                 </p>
                 <span>
                     
                 </span>
                 <p class="doc">
-                    <p>generates a hash state.</p>
+                    <p>generates a state for multi-part signing.</p>
 
                 </p>
             </div>
@@ -185,14 +206,34 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ref (Array Byte) b)] Int)
+                    (λ [(Ref HydroSignState), (Ref (Array Byte))] Int)
                 </p>
                 <pre class="args">
                     (update s buf)
                 </pre>
                 <p class="doc">
-                    <p>updates a multi-part hash using the state <code>s</code>, and a buffer
-<code>buf</code>.</p>
+                    <p>updates a sign state <code>s</code> with a buffer <code>buf</code>.</p>
+
+                </p>
+            </div>
+            <div class="binder">
+                <a class="anchor" href="#verify">
+                    <h3 id="verify">
+                        verify
+                    </h3>
+                </a>
+                <div class="description">
+                    defn
+                </div>
+                <p class="sig">
+                    (λ [(Ref (Array Byte)), (Ref (Array Byte)), (Ptr Char), (Ref KeyPair)] Bool)
+                </p>
+                <pre class="args">
+                    (verify signature msg ctx keypair)
+                </pre>
+                <p class="doc">
+                    <p>verifies a signature <code>signature</code> for a message <code>msg</code>, using the
+context <code>ctx</code> and the keypair <code>keypair</code>.</p>
 
                 </p>
             </div>

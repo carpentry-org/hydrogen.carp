@@ -52,147 +52,135 @@
                                 HydroPWHash
                             </a>
                         </li>
-                        <li>
-                            <a href="HydroKX.html">
-                                HydroKX
-                            </a>
-                        </li>
                     </ul>
                 </div>
             </div>
             <h1>
-                HydroHash
+                Hydro
             </h1>
             <div class="module-description">
-                <p>This module contains functions for hashing, both single
-and multi-part.</p>
-<p>Example:</p>
-<pre><code>(let [key (HydroHash.keygen)
-      msg (Hydro.buf &quot;Arbitrary data to hash&quot;)]
-  (println* &amp;(HydroHash.gen &amp;msg (Hydro.context &quot;Examples&quot;) &amp;key))))
-</code></pre>
+                <p>The base hydrogen module. It includes functions for creating and
+handling hydrogen buffers.</p>
 
             </div>
             <div class="binder">
-                <a class="anchor" href="#final">
-                    <h3 id="final">
-                        final
+                <a class="anchor" href="#=">
+                    <h3 id="=">
+                        =
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a)] (Maybe (Array Byte)))
+                    (λ [(Ref (Array Byte)), (Ref (Array Byte))] Bool)
                 </p>
                 <pre class="args">
-                    (final s)
+                    (= a b)
                 </pre>
                 <p class="doc">
-                    <p>finalizes a multi-part hash using the state <code>s</code>. Returns the
-final hash.</p>
+                    <p>compares two <code>(Array Byte)</code> instances in constant time. Comparing the
+same reference will lead to a failed comparison, as per the <a href="https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-for-equality">hydrogen
+specs</a>.</p>
 
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#gen">
-                    <h3 id="gen">
-                        gen
+                <a class="anchor" href="#buf">
+                    <h3 id="buf">
+                        buf
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a), (Ptr Char), (Ref (Array Byte) b)] (Maybe (Array Byte)))
+                    (λ [&amp;String] (Array Byte))
                 </p>
                 <pre class="args">
-                    (gen msg ctx key)
+                    (buf s)
                 </pre>
                 <p class="doc">
-                    <p>hashes a string <code>msg</code>, using a context <code>ctx</code> and a key <code>key</code>.</p>
+                    <p>creates an <code>(Array Byte)</code> from a string.</p>
 
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#init">
-                    <h3 id="init">
-                        init
+                <a class="anchor" href="#context">
+                    <h3 id="context">
+                        context
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ptr Char), (Ref (Array Byte) b)] Int)
+                    (λ [&amp;String] (Ptr Char))
                 </p>
                 <pre class="args">
-                    (init s ctx k)
+                    (context s)
                 </pre>
                 <p class="doc">
-                    <p>initializes a multi-part hash using the state <code>s</code>, a context <code>ctx</code>
-and a key <code>k</code>.</p>
+                    <p>creates a context from a string.</p>
 
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#keygen">
-                    <h3 id="keygen">
-                        keygen
+                <a class="anchor" href="#erase">
+                    <h3 id="erase">
+                        erase
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Array Byte))
+                    (λ [(Ref (Array Byte))] ())
                 </p>
                 <pre class="args">
-                    (keygen)
+                    (erase b)
                 </pre>
                 <p class="doc">
-                    <p>generates a key for use in hashing procedures.</p>
+                    <p>erases the contents of a <code>(Array Byte)</code> securely.</p>
 
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#state">
-                    <h3 id="state">
-                        state
+                <a class="anchor" href="#raw">
+                    <h3 id="raw">
+                        raw
                     </h3>
                 </a>
                 <div class="description">
                     external
                 </div>
                 <p class="sig">
-                    (λ [] HydroHashState)
+                    (λ [(Ref (Array Byte))] (Ptr Byte))
                 </p>
                 <span>
                     
                 </span>
                 <p class="doc">
-                    <p>generates a hash state.</p>
-
+                    
                 </p>
             </div>
             <div class="binder">
-                <a class="anchor" href="#update">
-                    <h3 id="update">
-                        update
+                <a class="anchor" href="#unbuf">
+                    <h3 id="unbuf">
+                        unbuf
                     </h3>
                 </a>
                 <div class="description">
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ref (Array Byte) b)] Int)
+                    (λ [(Ref (Array Byte))] String)
                 </p>
                 <pre class="args">
-                    (update s buf)
+                    (unbuf a)
                 </pre>
                 <p class="doc">
-                    <p>updates a multi-part hash using the state <code>s</code>, and a buffer
-<code>buf</code>.</p>
+                    <p>creates a string from a <code>(Array Byte)</code>.</p>
 
                 </p>
             </div>
