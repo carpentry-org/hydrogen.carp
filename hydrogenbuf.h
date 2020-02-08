@@ -5,13 +5,16 @@
 
 typedef hydro_hash_state HydroHashState;
 typedef hydro_sign_state HydroSignState;
+typedef hydro_sign_keypair HydroSignKeyPair;
 typedef hydro_kx_state HydroKXState;
+typedef hydro_kx_keypair HydroKXKeyPair;
+typedef hydro_kx_session_keypair HydroKXSessionKeyPair;
 
 uint8_t* Hydro_raw(Array* buf) {
   return buf->data;
 }
 
-hydro_sign_keypair HydroSign_keypair() {
+HydroSignKeyPair HydroSign_keypair() {
   hydro_sign_keypair pair;
   return pair;
 }
@@ -51,6 +54,24 @@ hydro_kx_state HydroKX_state() {
 
 uint8_t* HydroKX_pk(hydro_kx_keypair* pair) {
   return pair->pk;
+}
+
+Array HydroKX_rx(hydro_kx_session_keypair* pair) {
+  Array res;
+  res.data = CARP_MALLOC(hydro_kx_SESSIONKEYBYTES);
+  res.len = hydro_kx_SESSIONKEYBYTES;
+  res.capacity = hydro_kx_SESSIONKEYBYTES;
+  memcpy(res.data, pair->rx, hydro_kx_SESSIONKEYBYTES);
+  return res;
+}
+
+Array HydroKX_tx(hydro_kx_session_keypair* pair) {
+  Array res;
+  res.data = CARP_MALLOC(hydro_kx_SESSIONKEYBYTES);
+  res.len = hydro_kx_SESSIONKEYBYTES;
+  res.capacity = hydro_kx_SESSIONKEYBYTES;
+  memcpy(res.data, pair->tx, hydro_kx_SESSIONKEYBYTES);
+  return res;
 }
 
 Array Hydro_make_x_array(uint8_t e[hydro_kx_SESSIONKEYBYTES]) {
