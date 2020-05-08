@@ -1,8 +1,8 @@
 (relative-include "./hydrogenbuf.h")
 
-(add-cflag (Dynamic.String.join [(Dynamic.String.directory (file))
-                                 "/libhydrogen/hydrogen.c"
-]))
+(add-cflag (Dynamic.String.concat [(Dynamic.String.directory (file))
+                                   "/libhydrogen/hydrogen.c"
+                                  ]))
 
 (doc Hydro "The base hydrogen module. It includes functions for creating and
 handling hydrogen buffers.")
