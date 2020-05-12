@@ -78,7 +78,7 @@ handling hydrogen buffers.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a), (Ref (Array Byte) b)] Bool)
+                    (Fn [(Ref (Array Byte) a), (Ref (Array Byte) b)] Bool)
                 </p>
                 <pre class="args">
                     (= a b)
@@ -100,7 +100,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref String a)] (Array Byte))
+                    (Fn [(Ref String a)] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf s)
@@ -120,7 +120,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref String a)] (Ptr Char))
+                    (Fn [(Ref String a)] (Ptr CChar))
                 </p>
                 <pre class="args">
                     (context s)
@@ -140,7 +140,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a)] ())
+                    (Fn [(Ref (Array Byte) a)] ())
                 </p>
                 <pre class="args">
                     (erase b)
@@ -160,7 +160,7 @@ specs</a>.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a)] (Ptr Byte))
+                    (Fn [(Ref (Array Byte) a)] (Ptr Byte))
                 </p>
                 <span>
                     
@@ -179,7 +179,7 @@ specs</a>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a)] String)
+                    (Fn [(Ref (Array Byte) a)] String)
                 </p>
                 <pre class="args">
                     (unbuf a)

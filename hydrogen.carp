@@ -137,7 +137,7 @@ Example:
 
   (private init-)
   (hidden init-)
-  (register init- (Fn [&HydroHashState (Ptr Char) (Ptr Byte)] Int)
+  (register init- (Fn [&HydroHashState (Ptr CChar) (Ptr Byte)] Int)
             "hydro_hash_init")
   (doc init "initializes a multi-part hash using the state `s`, a context `ctx`
 and a key `k`.")
@@ -166,7 +166,7 @@ final hash.")
   (private gen-)
   (hidden gen-)
   (register gen-
-            (Fn [(Ptr Byte) Int (Ptr Byte) Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) Int (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_hash_hash")
   (doc gen "hashes a string `msg`, using a context `ctx` and a key `key`.")
   (defn gen [msg ctx key]
@@ -217,7 +217,7 @@ Example:
   (private derive-from-key-)
   (hidden derive-from-key-)
   (register derive-from-key-
-            (Fn [(Ptr Byte) Int Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_kdf_derive_from_key")
   (doc derive-from-key "derives a subkey of length `subkey-len` with the ID `id`,
 using the context `ctx` and the master key `key`.")
@@ -273,7 +273,7 @@ Example:
   (private encrypt-)
   (hidden encrypt-)
   (register encrypt-
-            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_secretbox_encrypt")
   (doc encrypt "encrypts a message `m` with the ID `id`, using the context
 `ctx` and key `key`.")
@@ -290,7 +290,7 @@ Example:
   (private decrypt-)
   (hidden decrypt-)
   (register decrypt-
-            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_secretbox_decrypt")
   (doc decrypt "encrypts a cipher `c` with the ID `id`, using the context
 `ctx` and key `key`.")
@@ -359,7 +359,7 @@ Example:
   (private create-)
   (hidden create-)
   (register create-
-            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_sign_create")
   (doc create "signs a message `msg`, using the context `ctx` and the keypair
 `keypair`.")
@@ -376,7 +376,7 @@ Example:
   (private verify-)
   (hidden verify-)
   (register verify-
-            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr Char) (Ptr Byte)] Int)
+            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
             "hydro_sign_create")
   (doc verify "verifies a signature `signature` for a message `msg`, using the
 context `ctx` and the keypair `keypair`.")
@@ -394,7 +394,7 @@ context `ctx` and the keypair `keypair`.")
   (register state (Fn [] HydroSignState))
 
   (doc init "initializes a state for multi-part signing, using a context.")
-  (register init (Fn [&HydroSignState (Ptr Char)] Bool)
+  (register init (Fn [&HydroSignState (Ptr CChar)] Bool)
             "hydro_sign_init")
 
   (private update-)
@@ -469,7 +469,7 @@ the slower the operation.")
   (private hash-deterministic-)
   (hidden hash-deterministic-)
   (register hash-deterministic-
-            (Fn [(Ptr Byte) Int (Ptr Char) Int (Ptr Char) HydrobBufRaw Int]
+            (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) HydrobBufRaw Int]
                 Int)
             "hydro_pwhash_deterministic")
   (doc hash-deterministic "generates a deterministic hash of length `len` from
@@ -488,7 +488,7 @@ the limit of operations `ops-limit`. Only use for testing!")
   (private create-)
   (hidden create-)
   (register create-
-            (Fn [(Ptr Byte) (Ptr Char) Int (Ptr Byte) Int Int Int] Int)
+            (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
             "hydro_pwhash_create")
   (doc create-with "generates a hash from the password `pwd`, using the master
 key `master-key` and a set of parameters.")
@@ -510,7 +510,7 @@ are filled in with the default values.")
   (private verify-)
   (hidden verify-)
   (register verify-
-            (Fn [(Ptr Byte) (Ptr Char) Int (Ptr Byte) Int Int Int] Int)
+            (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
             "hydro_pwhash_verify")
   (doc verify-with "verifies a hash for the password `pwd`, using the master
 key `master-key` and a set of parameters.")
@@ -527,7 +527,7 @@ are filled in with the default values.")
   (private derive-static-key-)
   (hidden derive-static-key-)
   (register derive-static-key-
-            (Fn [(Ptr Byte) Int (Ptr Byte) (Ptr Char) Int (Ptr Char)
+            (Fn [(Ptr Byte) Int (Ptr Byte) (Ptr CChar) Int (Ptr CChar)
                  (Ptr Byte) Int Int Int]
                  Int)
             "hydro_pwhash_derive_static_key")

@@ -84,7 +84,7 @@
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref String a), (Ref (Array Byte) b)] (Maybe (Array Byte)))
+                    (Fn [(Ref String a), (Ref (Array Byte) b)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create pwd master-key)
@@ -106,7 +106,7 @@ are filled in with the default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref String a), (Ref (Array Byte) b), Int, Int, Int] (Maybe (Array Byte)))
+                    (Fn [(Ref String a), (Ref (Array Byte) b), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (create-with pwd master-key ops-limit mem-limit threads)
@@ -127,7 +127,7 @@ key <code>master-key</code> and a set of parameters.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref (Array Byte) a), (Ref String b), (Ptr Char), (Ref (Array Byte) c)] (Maybe (Array Byte)))
+                    (Fn [Int, (Ref (Array Byte) a), (Ref String b), (Ptr CChar), (Ref (Array Byte) c)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-static-key static-key-len stored pwd ctx master-key)
@@ -151,7 +151,7 @@ default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref (Array Byte) a), (Ref String b), (Ptr Char), (Ref (Array Byte) c), Int, Int, Int] (Maybe (Array Byte)))
+                    (Fn [Int, (Ref (Array Byte) a), (Ref String b), (Ptr CChar), (Ref (Array Byte) c), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-static-key-with static-key-len stored pwd ctx master-key ops-limit-max mem-limit-max threads-max)
@@ -173,7 +173,7 @@ and a set of parameters.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref String a), (Ref (Array Byte) b), (Ref (Array Byte) c), d] (Maybe (Array Byte)))
+                    (Fn [Int, (Ref String a), (Ref (Array Byte) b), (Ref (Array Byte) c), d] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (hash-deterministic len pwd ctx master-key ops-limit)
@@ -195,7 +195,7 @@ the limit of operations <code>ops-limit</code>. Only use for testing!</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Array Byte))
+                    (Fn [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)
@@ -256,7 +256,7 @@ the slower the operation.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Array Byte), (Ref (Array Byte) a), (Ref (Array Byte) b)] (Maybe (Array Byte)))
+                    (Fn [(Array Byte), (Ref (Array Byte) a), (Ref (Array Byte) b)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (reencrypt stored old-master-key new-master-key)
@@ -297,7 +297,7 @@ from the old master key <code>old-master-key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Array Byte), (Ref (Array Byte) a), Int, Int, Int] (Maybe (Array Byte)))
+                    (Fn [(Array Byte), (Ref (Array Byte) a), Int, Int, Int] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (upgrade stored master-key ops-limit mem-limit threads)
@@ -318,7 +318,7 @@ from the old master key <code>old-master-key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Array Byte), (Ref String a), (Ref (Array Byte) b)] Bool)
+                    (Fn [(Array Byte), (Ref String a), (Ref (Array Byte) b)] Bool)
                 </p>
                 <pre class="args">
                     (verify hash pwd master-key)
@@ -340,7 +340,7 @@ are filled in with the default values.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Array Byte), (Ref String a), (Ref (Array Byte) b), Int, Int, Int] Bool)
+                    (Fn [(Array Byte), (Ref String a), (Ref (Array Byte) b), Int, Int, Int] Bool)
                 </p>
                 <pre class="args">
                     (verify-with hash pwd master-key ops-limit-max mem-limit-max threads-max)

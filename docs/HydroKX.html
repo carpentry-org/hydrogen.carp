@@ -80,7 +80,7 @@ but this should not be taken as an endorsement to use it.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] HydroKXKeyPair)
+                    (Fn [] HydroKXKeyPair)
                 </p>
                 <pre class="args">
                     (keygen)
@@ -100,7 +100,7 @@ but this should not be taken as an endorsement to use it.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroKXKeyPair a), HydroKXKeyPair] (Maybe (Pair HydroKXState (Array Byte))))
+                    (Fn [(Ref HydroKXKeyPair a), HydroKXKeyPair] (Maybe (Pair HydroKXState (Array Byte))))
                 </p>
                 <pre class="args">
                     (kk-1 skp ckp)
@@ -123,7 +123,7 @@ the server.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXKeyPair, (Ref HydroKXKeyPair a), (Array Byte)] (Maybe (Array (Array Byte))))
+                    (Fn [HydroKXKeyPair, (Ref HydroKXKeyPair a), (Array Byte)] (Maybe (Array (Array Byte))))
                 </p>
                 <pre class="args">
                     (kk-2 skp ckp p)
@@ -146,7 +146,7 @@ the packet to send to the client.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXState, (Array Byte), HydroKXKeyPair] (Maybe (Pair (Array Byte) (Array Byte))))
+                    (Fn [HydroKXState, (Array Byte), HydroKXKeyPair] (Maybe (Pair (Array Byte) (Array Byte))))
                 </p>
                 <pre class="args">
                     (kk-3 st p2 kp)
@@ -168,7 +168,7 @@ from the server. It validates the packet and computes the shared session key.</p
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroKXKeyPair a)] (Maybe (Array (Array Byte))))
+                    (Fn [(Ref HydroKXKeyPair a)] (Maybe (Array (Array Byte))))
                 </p>
                 <pre class="args">
                     (n-1 kp)
@@ -190,7 +190,7 @@ to send to the server.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXKeyPair, (Ptr Byte)] (Maybe (Pair (Array Byte) (Array Byte))))
+                    (Fn [HydroKXKeyPair, (Ptr Byte)] (Maybe (Pair (Array Byte) (Array Byte))))
                 </p>
                 <pre class="args">
                     (n-2 kp p)
@@ -212,7 +212,7 @@ session keys.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Maybe (Pair HydroKXState (Array Byte))))
+                    (Fn [] (Maybe (Pair HydroKXState (Array Byte))))
                 </p>
                 <pre class="args">
                     (xx-1)
@@ -235,7 +235,7 @@ the server.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXKeyPair, (Array Byte)] (Maybe (Pair HydroKXState (Array Byte))))
+                    (Fn [HydroKXKeyPair, (Array Byte)] (Maybe (Pair HydroKXState (Array Byte))))
                 </p>
                 <pre class="args">
                     (xx-2 skp p)
@@ -258,7 +258,7 @@ client.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXState, (Array Byte), HydroKXKeyPair] (Maybe (Array (Array Byte))))
+                    (Fn [HydroKXState, (Array Byte), HydroKXKeyPair] (Maybe (Array (Array Byte))))
                 </p>
                 <pre class="args">
                     (xx-3 st p2 kp)
@@ -281,7 +281,7 @@ server, and computes the shared session key.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [HydroKXState, (Array Byte)] (Maybe (Pair (Array Byte) (Array Byte))))
+                    (Fn [HydroKXState, (Array Byte)] (Maybe (Pair (Array Byte) (Array Byte))))
                 </p>
                 <pre class="args">
                     (xx-4 st p3)

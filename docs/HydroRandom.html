@@ -81,7 +81,7 @@ numbers and handling of the random number generator.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int] (Array Byte))
+                    (Fn [Int] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf n)
@@ -101,7 +101,7 @@ numbers and handling of the random number generator.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, (Ref (Array Byte) a)] (Array Byte))
+                    (Fn [Int, (Ref (Array Byte) a)] (Array Byte))
                 </p>
                 <pre class="args">
                     (buf-deterministic len seed)
@@ -124,7 +124,7 @@ useful for writing tests.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [] ())
+                    (Fn [] ())
                 </p>
                 <span>
                     
@@ -145,7 +145,7 @@ states impossible.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [] ())
+                    (Fn [] ())
                 </p>
                 <span>
                     
@@ -186,7 +186,7 @@ threads.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [] Int)
+                    (Fn [] Int)
                 </p>
                 <span>
                     
@@ -206,7 +206,7 @@ threads.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [Int] Int)
+                    (Fn [Int] Int)
                 </p>
                 <span>
                     

@@ -14,7 +14,7 @@ While the documentation aims to be somewhat comprehensive, looking at the
 encouraged for additional context.
 
 ```
-(load \"git@github.com:carpentry-org/hydrogen.carp.git@0.0.2\")
+(load \"git@github.com:carpentry-org/hydrogen.carp.git@0.0.3\")
 
 (def context (Hydro.context \"Examples\"))
 (def msg (Hydro.buf \"Arbitrary data to hash\"))

@@ -85,7 +85,7 @@
                     defn
                 </div>
                 <p class="sig">
-                    (λ [Int, Int, (Ptr Char), (Ref (Array Byte) a)] (Maybe (Array Byte)))
+                    (Fn [Int, Int, (Ptr CChar), (Ref (Array Byte) a)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (derive-from-key subkey-len id ctx key)
@@ -106,7 +106,7 @@ using the context <code>ctx</code> and the master key <code>key</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Array Byte))
+                    (Fn [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)

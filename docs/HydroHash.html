@@ -83,7 +83,7 @@ and multi-part.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a)] (Maybe (Array Byte)))
+                    (Fn [(Ref HydroHashState a)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (final s)
@@ -104,7 +104,7 @@ final hash.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref (Array Byte) a), (Ptr Char), (Ref (Array Byte) b)] (Maybe (Array Byte)))
+                    (Fn [(Ref (Array Byte) a), (Ptr CChar), (Ref (Array Byte) b)] (Maybe (Array Byte)))
                 </p>
                 <pre class="args">
                     (gen msg ctx key)
@@ -124,7 +124,7 @@ final hash.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ptr Char), (Ref (Array Byte) b)] Int)
+                    (Fn [(Ref HydroHashState a), (Ptr CChar), (Ref (Array Byte) b)] Int)
                 </p>
                 <pre class="args">
                     (init s ctx k)
@@ -145,7 +145,7 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [] (Array Byte))
+                    (Fn [] (Array Byte))
                 </p>
                 <pre class="args">
                     (keygen)
@@ -165,7 +165,7 @@ and a key <code>k</code>.</p>
                     external
                 </div>
                 <p class="sig">
-                    (λ [] HydroHashState)
+                    (Fn [] HydroHashState)
                 </p>
                 <span>
                     
@@ -185,7 +185,7 @@ and a key <code>k</code>.</p>
                     defn
                 </div>
                 <p class="sig">
-                    (λ [(Ref HydroHashState a), (Ref (Array Byte) b)] Int)
+                    (Fn [(Ref HydroHashState a), (Ref (Array Byte) b)] Int)
                 </p>
                 <pre class="args">
                     (update s buf)

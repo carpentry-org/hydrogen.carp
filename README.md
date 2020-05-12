@@ -4,7 +4,7 @@ A simple wrapper around [libhydrogen](https://github.com/jedisct1/libhydrogen)
 for Carp.
 
 ```clojure
-(load "git@github.com:carpentry-org/hydrogen.carp.git@0.0.2")
+(load "git@github.com:carpentry-org/hydrogen.carp.git@0.0.3")
 
 (def CONTEXT (Hydro.context "Examples"))
 (def MSG (Hydro.buf "Arbitrary data to hash"))
@@ -17,7 +17,7 @@ for Carp.
 ## Installation
 
 ```clojure
-(load "git@github.com:carpentry-org/hydrogen.carp.git@0.0.2")
+(load "git@github.com:carpentry-org/hydrogen.carp.git@0.0.3")
 ```
 
 ## Usage
