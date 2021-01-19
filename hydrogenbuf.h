@@ -15,7 +15,7 @@ uint8_t* Hydro_raw(Array* buf) {
 }
 
 HydroSignKeyPair HydroSign_keypair() {
-  hydro_sign_keypair pair;
+  hydro_sign_keypair pair = {};
   return pair;
 }
 
@@ -28,27 +28,27 @@ uint8_t* HydroSign_sk(hydro_sign_keypair* pair) {
 }
 
 hydro_hash_state HydroHash_state() {
-  hydro_hash_state state;
+  hydro_hash_state state = {};
   return state;
 }
 
 hydro_sign_state HydroSign_state() {
-  hydro_sign_state state;
+  hydro_sign_state state = {};
   return state;
 }
 
 hydro_kx_keypair HydroKX_keypair() {
-  hydro_kx_keypair pair;
+  hydro_kx_keypair pair = {};
   return pair;
 }
 
 hydro_kx_session_keypair HydroKX_session_MINUS_keypair() {
-  hydro_kx_session_keypair pair;
+  hydro_kx_session_keypair pair = {};
   return pair;
 }
 
 hydro_kx_state HydroKX_state() {
-  hydro_kx_state state;
+  hydro_kx_state state = {};
   return state;
 }
 

@@ -1,5 +1,4 @@
 (load "hydrogen.carp")
-(Debug.sanitize-addresses)
 
 (def CONTEXT (Hydro.context "Examples"))
 

@@ -1,6 +1,6 @@
 (relative-include "./hydrogenbuf.h")
 
-(add-cflag (Dynamic.String.concat [(Dynamic.String.directory (file))
+(add-cflag (Dynamic.String.concat [(Dynamic.Path.directory (file))
                                    "/libhydrogen/hydrogen.c"
                                   ]))
 
@@ -9,9 +9,13 @@ handling hydrogen buffers.")
 (defmodule Hydro
   (register raw (Fn [&(Array Byte)] (Ptr Byte)))
 
-  (private init)
   (hidden init)
+  (private init)
   (register init (Fn [] ()) "hydro_init")
+
+  (hidden _)
+  (private _)
+  (def _ (do (Hydro.init) 0))
 
   (doc buf "creates an `(Array Byte)` from a string.")
   (defn buf [s]
@@ -45,8 +49,6 @@ specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-f
       (assert (= (length s) 8))
       (cstr s)))
 )
-
-(Hydro.init)
 
 (doc HydroRandom "This module contains functions for the creation of random
 numbers and handling of the random number generator.
