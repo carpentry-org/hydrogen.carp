@@ -1,8 +1,8 @@
 (relative-include "./hydrogenbuf.h")
 
-(add-cflag (Dynamic.String.concat [(Dynamic.Path.directory (file))
-                                   "/libhydrogen/hydrogen.c"
-                                  ]))
+(add-cflag
+  (Dynamic.String.concat
+    [(Dynamic.Path.directory (file)) "/libhydrogen/hydrogen.c"]))
 
 (doc Hydro "The base hydrogen module. It includes functions for creating and
 handling hydrogen buffers.")
@@ -23,8 +23,7 @@ handling hydrogen buffers.")
 
   (doc unbuf "creates a string from a `(Array Byte)`.")
   (defn unbuf [a]
-    (from-chars
-      &(Array.copy-map &(fn [c] (Char.from-int (Byte.to-int @c))) a)))
+    (from-chars &(Array.copy-map &(fn [c] (Char.from-int (Byte.to-int @c))) a)))
 
   (private erase-)
   (hidden erase-)
@@ -44,11 +43,7 @@ specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-f
       (eq- (raw a) (raw b) (Array.length a))))
 
   (doc context "creates a context from a string.")
-  (defn context [s]
-    (do
-      (assert (= (length s) 8))
-      (cstr s)))
-)
+  (defn context [s] (do (assert (= (length s) 8)) (cstr s))))
 
 (doc HydroRandom "This module contains functions for the creation of random
 numbers and handling of the random number generator.
@@ -71,10 +66,7 @@ provided as argument.")
   (hidden buf-)
   (register buf- (Fn [(Ptr Byte) Int] ()) "hydro_random_buf")
   (doc buf "creates a buffer containing random numbers.")
-  (defn buf [n]
-    (let-do [b (Array.allocate n)]
-      (buf- (Hydro.raw &b) n)
-      b))
+  (defn buf [n] (let-do [b (Array.allocate n)] (buf- (Hydro.raw &b) n) b))
 
   (doc ratchet "erases part of the RNG state to make recovering previous RNG
 states impossible.")
@@ -84,18 +76,17 @@ threads.")
   (register reseed (Fn [] ()) "hydro_random_reseed")
   (private buf-deterministic-)
   (hidden buf-deterministic-)
-  (register buf-deterministic- (Fn [(Ptr Byte) Int (Ptr Byte)] ())
-            "hydro_random_buf_deterministic")
+  (register buf-deterministic-
+    (Fn [(Ptr Byte) Int (Ptr Byte)] ())
+    "hydro_random_buf_deterministic")
   (doc buf-deterministic "creates a buffer containing `len` numbers
 indistinguishable from random bytes without knowing `seed`. For a given seed,
 this function will always output the same sequence. This function is mainly
 useful for writing tests.")
   (defn buf-deterministic [len seed]
     (let-do [buf (Array.allocate len)]
-      (buf-deterministic-
-        (Hydro.raw &buf) (Array.length &buf) (Hydro.raw seed))
-      buf))
-)
+      (buf-deterministic- (Hydro.raw &buf) (Array.length &buf) (Hydro.raw seed))
+      buf)))
 
 (doc HydroHash "This module contains functions for hashing, both single
 and multi-part.
@@ -133,30 +124,29 @@ Example:
   (register keygen- (Fn [(Ptr Byte)] ()) "hydro_hash_keygen")
   (doc keygen "generates a key for use in hashing procedures.")
   (defn keygen []
-    (let-do [k (Array.allocate key-bytes)]
-      (keygen- (Hydro.raw &k))
-      k))
+    (let-do [k (Array.allocate key-bytes)] (keygen- (Hydro.raw &k)) k))
 
   (private init-)
   (hidden init-)
-  (register init- (Fn [&HydroHashState (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_hash_init")
+  (register init-
+    (Fn [&HydroHashState (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_hash_init")
   (doc init "initializes a multi-part hash using the state `s`, a context `ctx`
 and a key `k`.")
   (defn init [s ctx k] (init- s ctx (Hydro.raw k)))
 
   (private update-)
   (hidden update-)
-  (register update- (Fn [&HydroHashState (Ptr Byte) Int] Int)
-            "hydro_hash_update")
+  (register update-
+    (Fn [&HydroHashState (Ptr Byte) Int] Int)
+    "hydro_hash_update")
   (doc update "updates a multi-part hash using the state `s`, and a buffer
 `buf`.")
   (defn update [s buf] (update- s (Hydro.raw buf) (Array.length buf)))
 
   (private final-)
   (hidden final-)
-  (register final- (Fn [&HydroHashState (Ptr Byte) Int] Int)
-            "hydro_hash_final")
+  (register final- (Fn [&HydroHashState (Ptr Byte) Int] Int) "hydro_hash_final")
   (doc final "finalizes a multi-part hash using the state `s`. Returns the
 final hash.")
   (defn final [s]
@@ -168,18 +158,22 @@ final hash.")
   (private gen-)
   (hidden gen-)
   (register gen-
-            (Fn [(Ptr Byte) Int (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_hash_hash")
+    (Fn [(Ptr Byte) Int (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_hash_hash")
   (doc gen "hashes a string `msg`, using a context `ctx` and a key `key`.")
   (defn gen [msg ctx key]
     (let [hash (Array.allocate bytes)]
-      (if (= 0
-        (gen-
-          (Hydro.raw &hash) (Array.length &hash) (Hydro.raw msg)
-          (Array.length msg) ctx (Hydro.raw key)))
+      (if (=
+          0
+          (gen-
+            (Hydro.raw &hash)
+            (Array.length &hash)
+            (Hydro.raw msg)
+            (Array.length msg)
+            ctx
+            (Hydro.raw key)))
         (Maybe.Just hash)
-        (Maybe.Nothing))))
-)
+        (Maybe.Nothing)))))
 
 (doc HydroKDF "This module contains functions for key derivation.
 
@@ -212,27 +206,31 @@ Example:
   (register keygen- (Fn [(Ptr Byte)] ()) "hydro_kdf_keygen")
   (doc keygen "generates a master key for use in key derivation procedures.")
   (defn keygen []
-    (let-do [k (Array.allocate key-bytes)]
-      (keygen- (Hydro.raw &k))
-      k))
+    (let-do [k (Array.allocate key-bytes)] (keygen- (Hydro.raw &k)) k))
 
   (private derive-from-key-)
   (hidden derive-from-key-)
   (register derive-from-key-
-            (Fn [(Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_kdf_derive_from_key")
-  (doc derive-from-key "derives a subkey of length `subkey-len` with the ID `id`,
+    (Fn [(Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_kdf_derive_from_key")
+  (doc derive-from-key
+    "derives a subkey of length `subkey-len` with the ID `id`,
 using the context `ctx` and the master key `key`.")
   (defn derive-from-key [subkey-len id ctx key]
     (let [sub (Array.allocate subkey-len)]
-      (if (= 0 (derive-from-key-
-        (Hydro.raw &sub) (Array.length &sub) id ctx (Hydro.raw key)
-        ))
+      (if (=
+          0
+          (derive-from-key-
+            (Hydro.raw &sub)
+            (Array.length &sub)
+            id
+            ctx
+            (Hydro.raw key)))
         (Maybe.Just sub)
-        (Maybe.Nothing))))
-)
+        (Maybe.Nothing)))))
 
-(doc HydroSecretBox "This module contains functions for encryption and decryption.
+(doc HydroSecretBox
+  "This module contains functions for encryption and decryption.
 [Probing](https://github.com/jedisct1/libhydrogen/wiki/Secret-key-encryption#probes)
 is not yet supported.
 
@@ -268,44 +266,49 @@ Example:
   (register keygen- (Fn [(Ptr Byte)] ()) "hydro_secretbox_keygen")
   (doc keygen "generates a key for use in encryption/decryption procedures.")
   (defn keygen []
-    (let-do [k (Array.allocate key-bytes)]
-      (keygen- (Hydro.raw &k))
-      k))
+    (let-do [k (Array.allocate key-bytes)] (keygen- (Hydro.raw &k)) k))
 
   (private encrypt-)
   (hidden encrypt-)
   (register encrypt-
-            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_secretbox_encrypt")
+    (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_secretbox_encrypt")
   (doc encrypt "encrypts a message `m` with the ID `id`, using the context
 `ctx` and key `key`.")
   (defn encrypt [m id ctx key]
     (let [c (Array.allocate (+ (Array.length m) header-bytes))]
-      (if (= 0
-        (encrypt-
-          (Hydro.raw &c) (Hydro.raw m) (Array.length m) id
-          ctx (Hydro.raw key)
-        ))
+      (if (=
+          0
+          (encrypt-
+            (Hydro.raw &c)
+            (Hydro.raw m)
+            (Array.length m)
+            id
+            ctx
+            (Hydro.raw key)))
         (Maybe.Just c)
         (Maybe.Nothing))))
 
   (private decrypt-)
   (hidden decrypt-)
   (register decrypt-
-            (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_secretbox_decrypt")
+    (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_secretbox_decrypt")
   (doc decrypt "encrypts a cipher `c` with the ID `id`, using the context
 `ctx` and key `key`.")
   (defn decrypt [c id ctx key]
     (let [m (Array.allocate (- (Array.length c) header-bytes))]
-      (if (= 0
-        (decrypt-
-          (Hydro.raw &m) (Hydro.raw c) (Array.length c) id
-          ctx (Hydro.raw key)
-        ))
+      (if (=
+          0
+          (decrypt-
+            (Hydro.raw &m)
+            (Hydro.raw c)
+            (Array.length c)
+            id
+            ctx
+            (Hydro.raw key)))
         (Maybe.Just m)
-        (Maybe.Nothing))))
-)
+        (Maybe.Nothing)))))
 
 (doc HydroSign "This module contains functions for signing data, both single-
 and multi-part.
@@ -353,63 +356,65 @@ Example:
   (hidden keygen-)
   (register keygen- (Fn [&HydroSignKeyPair] ()) "hydro_sign_keygen")
   (doc keygen "generates a key for use in signing procedures.")
-  (defn keygen []
-    (let-do [k (keypair)]
-      (keygen- &k)
-      k))
+  (defn keygen [] (let-do [k (keypair)] (keygen- &k) k))
 
   (private create-)
   (hidden create-)
   (register create-
-            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_sign_create")
+    (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_sign_create")
   (doc create "signs a message `msg`, using the context `ctx` and the keypair
 `keypair`.")
   (defn create [msg ctx keypair]
     (let [signature (Array.allocate bytes)]
-      (if (= 0
-        (create-
-          (Hydro.raw &signature) (Hydro.raw msg) (Array.length msg)
-          ctx (sk keypair)
-        ))
+      (if (=
+          0
+          (create-
+            (Hydro.raw &signature)
+            (Hydro.raw msg)
+            (Array.length msg)
+            ctx
+            (sk keypair)))
         (Maybe.Just signature)
         (Maybe.Nothing))))
 
   (private verify-)
   (hidden verify-)
   (register verify-
-            (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
-            "hydro_sign_create")
+    (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_sign_create")
   (doc verify "verifies a signature `signature` for a message `msg`, using the
 context `ctx` and the keypair `keypair`.")
   (defn verify [signature msg ctx keypair]
-    (= 0
+    (=
+      0
       (verify-
-        (Hydro.raw signature) (Hydro.raw msg) (Array.length msg)
-        ctx (pk keypair)
-      )
-    )
-  )
+        (Hydro.raw signature)
+        (Hydro.raw msg)
+        (Array.length msg)
+        ctx
+        (pk keypair))))
 
   (register-type HydroSignState)
   (doc state "generates a state for multi-part signing.")
   (register state (Fn [] HydroSignState))
 
   (doc init "initializes a state for multi-part signing, using a context.")
-  (register init (Fn [&HydroSignState (Ptr CChar)] Bool)
-            "hydro_sign_init")
+  (register init (Fn [&HydroSignState (Ptr CChar)] Bool) "hydro_sign_init")
 
   (private update-)
   (hidden update-)
-  (register update- (Fn [&HydroSignState (Ptr Byte) Int] Int)
-            "hydro_sign_update")
+  (register update-
+    (Fn [&HydroSignState (Ptr Byte) Int] Int)
+    "hydro_sign_update")
   (doc update "updates a sign state `s` with a buffer `buf`.")
   (defn update [s buf] (update- s (Hydro.raw buf) (Array.length buf)))
 
   (private final-create-)
   (hidden final-create-)
-  (register final-create- (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
-            "hydro_sign_final_create")
+  (register final-create-
+    (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
+    "hydro_sign_final_create")
   (doc final-create "finalizes a sign state `s` with a keypair `keypair`.
 Returns a signature.")
   (defn final-create [s keypair]
@@ -420,14 +425,14 @@ Returns a signature.")
 
   (private final-verify-)
   (hidden final-verify-)
-  (register final-verify- (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
-            "hydro_sign_final_verify")
+  (register final-verify-
+    (Fn [&HydroSignState (Ptr Byte) (Ptr Byte)] Int)
+    "hydro_sign_final_verify")
   (doc final-verify "finalizes a sign state `s` with a signature `signature`
 and a keypair `keypair`. Returns a boolean signifying whether we were able to
 verify the signature.")
   (defn final-verify [s signature keypair]
-    (= 0 (final-verify- s (Hydro.raw &signature) (pk keypair))))
-)
+    (= 0 (final-verify- s (Hydro.raw &signature) (pk keypair)))))
 
 (doc HydroPWHash "This module contains functions for hashing passwords.
 
@@ -464,43 +469,50 @@ the slower the operation.")
   (register keygen- (Fn [(Ptr Byte)] ()) "hydro_pwhash_keygen")
   (doc keygen "generates a key for use in password hashing procedures.")
   (defn keygen []
-    (let-do [k (Array.allocate master-key-bytes)]
-      (keygen- (Hydro.raw &k))
-      k))
+    (let-do [k (Array.allocate master-key-bytes)] (keygen- (Hydro.raw &k)) k))
 
   (private hash-deterministic-)
   (hidden hash-deterministic-)
   (register hash-deterministic-
-            (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) HydrobBufRaw Int]
-                Int)
-            "hydro_pwhash_deterministic")
+    (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) HydrobBufRaw Int] Int)
+    "hydro_pwhash_deterministic")
   (doc hash-deterministic "generates a deterministic hash of length `len` from
 the password `pwd`, using the context `ctx`, the master key `master-key`, and
 the limit of operations `ops-limit`. Only use for testing!")
   (defn hash-deterministic [len pwd ctx master-key ops-limit]
     (let [h (Array.allocate len)]
-      (if (= 0
-        (hash-deterministic
-          (Hydro.raw &h) len (cstr pwd) (length pwd) (Hydro.raw ctx)
-          (Hydro.raw master-key) ops-limit
-        ))
+      (if (=
+          0
+          (hash-deterministic
+            (Hydro.raw &h)
+            len
+            (cstr pwd)
+            (length pwd)
+            (Hydro.raw ctx)
+            (Hydro.raw master-key)
+            ops-limit))
         (Maybe.Just h)
         (Maybe.Nothing))))
 
   (private create-)
   (hidden create-)
   (register create-
-            (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
-            "hydro_pwhash_create")
+    (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
+    "hydro_pwhash_create")
   (doc create-with "generates a hash from the password `pwd`, using the master
 key `master-key` and a set of parameters.")
   (defn create-with [pwd master-key ops-limit mem-limit threads]
     (let [h (Array.allocate stored-bytes)]
-      (if (= 0
-        (create-
-          (Hydro.raw &h) (cstr pwd) (length pwd) (Hydro.raw master-key)
-          ops-limit mem-limit threads
-        ))
+      (if (=
+          0
+          (create-
+            (Hydro.raw &h)
+            (cstr pwd)
+            (length pwd)
+            (Hydro.raw master-key)
+            ops-limit
+            mem-limit
+            threads))
         (Maybe.Just h)
         (Maybe.Nothing))))
   (doc create "generates a hash from the password `pwd`, using the master
@@ -512,14 +524,21 @@ are filled in with the default values.")
   (private verify-)
   (hidden verify-)
   (register verify-
-            (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
-            "hydro_pwhash_verify")
+    (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
+    "hydro_pwhash_verify")
   (doc verify-with "verifies a hash for the password `pwd`, using the master
 key `master-key` and a set of parameters.")
   (defn verify-with [hash pwd master-key ops-limit-max mem-limit-max threads-max]
-    (= 0 (verify- (Hydro.raw &hash) (cstr pwd) (length pwd)
-                  (Hydro.raw master-key) ops-limit-max mem-limit-max
-                  threads-max)))
+    (=
+      0
+      (verify-
+        (Hydro.raw &hash)
+        (cstr pwd)
+        (length pwd)
+        (Hydro.raw master-key)
+        ops-limit-max
+        mem-limit-max
+        threads-max)))
   (doc verify "verifies a hash for the password `pwd`, using the master
 key `master-key`. The extra parameters used in [`verify-with`](#verify-with)
 are filled in with the default values.")
@@ -529,20 +548,46 @@ are filled in with the default values.")
   (private derive-static-key-)
   (hidden derive-static-key-)
   (register derive-static-key-
-            (Fn [(Ptr Byte) Int (Ptr Byte) (Ptr CChar) Int (Ptr CChar)
-                 (Ptr Byte) Int Int Int]
-                 Int)
-            "hydro_pwhash_derive_static_key")
+    (Fn
+      [
+        (Ptr Byte)
+        Int
+        (Ptr Byte)
+        (Ptr CChar)
+        Int
+        (Ptr CChar)
+        (Ptr Byte)
+        Int
+        Int
+        Int]
+      Int)
+    "hydro_pwhash_derive_static_key")
   (doc derive-static-key-with "derives a static key of length `static-key-len`
 for `stored` and `pwd`, using the context `ctx`, the master key `master-key`
 and a set of parameters.")
-  (defn derive-static-key-with [static-key-len stored pwd ctx master-key
-                                ops-limit-max mem-limit-max threads-max]
+  (defn derive-static-key-with [
+      static-key-len
+      stored
+      pwd
+      ctx
+      master-key
+      ops-limit-max
+      mem-limit-max
+      threads-max]
     (let [static-key (Array.allocate static-key-len)]
-      (if (= 0 (derive-static-key-
-        (Hydro.raw &static-key) static-key-len (Hydro.raw stored)
-        (cstr pwd) (length pwd) ctx (Hydro.raw master-key) ops-limit-max
-        mem-limit-max threads-max))
+      (if (=
+          0
+          (derive-static-key-
+            (Hydro.raw &static-key)
+            static-key-len
+            (Hydro.raw stored)
+            (cstr pwd)
+            (length pwd)
+            ctx
+            (Hydro.raw master-key)
+            ops-limit-max
+            mem-limit-max
+            threads-max))
         (Maybe.Just static-key)
         (Maybe.Nothing))))
   (doc derive-static-key "derives a static key of length `static-key-len`
@@ -552,32 +597,50 @@ for `stored` and `pwd`, using the context `ctx` and the master key
 default values.")
   (defn derive-static-key [static-key-len stored pwd ctx master-key]
     (derive-static-key-with
-      static-key-len stored pwd ctx master-key ops-limit mem-limit threads))
+      static-key-len
+      stored
+      pwd
+      ctx
+      master-key
+      ops-limit
+      mem-limit
+      threads))
 
   (private reencrypt-)
   (hidden reencrypt-)
-  (register reencrypt- (Fn [(Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
-            "hydro_pwhash_reencrypt")
+  (register reencrypt-
+    (Fn [(Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
+    "hydro_pwhash_reencrypt")
   (doc reencrypt "reencrypts `stored` using a new master key `new-master-key`
 from the old master key `old-master-key`.")
   (defn reencrypt [stored old-master-key new-master-key]
-    (if (= 0 (reencrypt- (Hydro.raw &stored) (Hydro.raw old-master-key)
-                         (Hydro.raw new-master-key)))
+    (if (=
+        0
+        (reencrypt-
+          (Hydro.raw &stored)
+          (Hydro.raw old-master-key)
+          (Hydro.raw new-master-key)))
       (Maybe.Just stored)
       (Maybe.Nothing)))
 
   (private upgrade-)
   (hidden upgrade-)
-  (register upgrade- (Fn [(Ptr Byte) (Ptr Byte) Int Int Int] Int)
-            "hydro_pwhash_upgrade")
+  (register upgrade-
+    (Fn [(Ptr Byte) (Ptr Byte) Int Int Int] Int)
+    "hydro_pwhash_upgrade")
   (doc upgrade "upgrades `stored` with new parameters, using the master key
 `master-key`.")
   (defn upgrade [stored master-key ops-limit mem-limit threads]
-    (if (= 0 (upgrade- (Hydro.raw &stored) (Hydro.raw master-key)
-                       ops-limit mem-limit threads))
+    (if (=
+        0
+        (upgrade-
+          (Hydro.raw &stored)
+          (Hydro.raw master-key)
+          ops-limit
+          mem-limit
+          threads))
       (Maybe.Just stored)
-      (Maybe.Nothing)))
-)
+      (Maybe.Nothing))))
 
 (doc HydroKX "This module contains functions for key exchange.
 
@@ -592,28 +655,28 @@ but this should not be taken as an endorsement to use it.")
   (hidden public-key-bytes)
   (register public-key-bytes Int "hydro_kx_PUBLICKEYBYTES")
   (private secret-key-bytes)
-  (hidden  secret-key-bytes)
+  (hidden secret-key-bytes)
   (register secret-key-bytes Int "hydro_kx_SECRETKEYBYTES")
   (private psk-bytes)
-  (hidden  psk-bytes)
+  (hidden psk-bytes)
   (register psk-bytes Int "hydro_kx_PSKBYTES")
   (private n-packet1-bytes)
-  (hidden  n-packet1-bytes)
+  (hidden n-packet1-bytes)
   (register n-packet1-bytes Int "hydro_kx_N_PACKET1BYTES")
   (private k-packet1-bytes)
-  (hidden  k-packet1-bytes)
+  (hidden k-packet1-bytes)
   (register k-packet1-bytes Int "hydro_kx_KK_PACKET1BYTES")
   (private x-packet1-bytes)
-  (hidden  x-packet1-bytes)
+  (hidden x-packet1-bytes)
   (register x-packet1-bytes Int "hydro_kx_XX_PACKET1BYTES")
   (private k-packet2-bytes)
-  (hidden  k-packet2-bytes)
+  (hidden k-packet2-bytes)
   (register k-packet2-bytes Int "hydro_kx_KK_PACKET2BYTES")
   (private x-packet2-bytes)
-  (hidden  x-packet2-bytes)
+  (hidden x-packet2-bytes)
   (register x-packet2-bytes Int "hydro_kx_XX_PACKET2BYTES")
   (private x-packet3-bytes)
-  (hidden  x-packet3-bytes)
+  (hidden x-packet3-bytes)
   (register x-packet3-bytes Int "hydro_kx_XX_PACKET3BYTES")
 
   (register-type HydroKXKeyPair)
@@ -646,16 +709,13 @@ but this should not be taken as an endorsement to use it.")
   (hidden keygen-)
   (register keygen- (Fn [&HydroKXKeyPair] ()) "hydro_kx_keygen")
   (doc keygen "generates a key for use in key exchange procedures.")
-  (defn keygen []
-    (let-do [k (keypair)]
-      (keygen- &k)
-      k))
+  (defn keygen [] (let-do [k (keypair)] (keygen- &k) k))
 
   (private n-1-)
   (hidden n-1-)
   (register n-1-
-            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
-            "hydro_kx_n_1")
+    (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)] Int)
+    "hydro_kx_n_1")
   (doc n-1 "generates session keys and a packet with an ephemeral public key
 to send to the server.
 
@@ -670,9 +730,8 @@ If all goes well, it returns [`packet1`, `tx`, rx].")
   (private n-2-)
   (hidden n-2-)
   (register n-2-
-            (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) &HydroKXKeyPair]
-                Int)
-            "hydro_kx_n_2")
+    (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
+    "hydro_kx_n_2")
   (doc n-2 "process the initial request from the client, and computes the
 session keys.
 
@@ -683,125 +742,129 @@ If all goes well, it returns a pair of (`tx`, `rx`).")
         (Maybe.Just (Pair.init (tx &s) (rx &s)))
         (Maybe.Nothing))))
 
-    (private kk-1-)
-    (hidden kk-1-)
-    (register kk-1-
-              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
-              "hydro_kx_kk_1")
-    (doc kk-1 "s called by a client initiating a connection. It initializes the
+  (private kk-1-)
+  (hidden kk-1-)
+  (register kk-1-
+    (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
+    "hydro_kx_kk_1")
+  (doc kk-1 "s called by a client initiating a connection. It initializes the
 state, computes an ephemeral key pair, and creates the first packet to send to
 the server.
 
 If all goes well, it returns a pair of (`state`, `packet1`).")
-    (defn kk-1 [skp ckp]
-      (let [st (state)
-            b (Array.allocate k-packet1-bytes)]
+  (defn kk-1 [skp ckp]
+    (let [st (state)
+          b (Array.allocate k-packet1-bytes)]
       (if (= 0 (kk-1- &st (Hydro.raw &b) (pk skp) &ckp))
         (Maybe.Just (Pair.init st b))
         (Maybe.Nothing))))
 
-    (private kk-2-)
-    (hidden kk-2-)
-    (register kk-2-
-              (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)
-                   &HydroKXKeyPair] Int)
-              "hydro_kx_kk_2")
-    (doc kk-2 "has to be called by the server after a client request has been
+  (private kk-2-)
+  (hidden kk-2-)
+  (register kk-2-
+    (Fn
+      [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) &HydroKXKeyPair]
+      Int)
+    "hydro_kx_kk_2")
+  (doc kk-2 "has to be called by the server after a client request has been
 received. It validates the request, computes an ephemeral key pair and creates
 the packet to send to the client.
 
 If all goes well, it returns [`packet2`, `tx`, `rx].")
-    (defn kk-2 [skp ckp p]
-      (let [s (session-keypair)
-            b (Array.allocate k-packet2-bytes)]
+  (defn kk-2 [skp ckp p]
+    (let [s (session-keypair)
+          b (Array.allocate k-packet2-bytes)]
       (if (= 0 (kk-2- &s (Hydro.raw &b) (Hydro.raw &p) (pk ckp) &skp))
         (Maybe.Just [b (tx &s) (rx &s)])
         (Maybe.Nothing))))
 
-    (private kk-3-)
-    (hidden kk-3-)
-    (register kk-3-
-              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte)
-                   &HydroKXKeyPair] Int)
-              "hydro_kx_kk_3")
-    (doc kk-3 "has to be called by the client after having received the packet
+  (private kk-3-)
+  (hidden kk-3-)
+  (register kk-3-
+    (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) &HydroKXKeyPair] Int)
+    "hydro_kx_kk_3")
+  (doc kk-3 "has to be called by the client after having received the packet
 from the server. It validates the packet and computes the shared session key.
 
 If all goes well, it returns a pair of (`tx`, `rx`).")
-    (defn kk-3 [st p2 kp]
-      (let [s (session-keypair)]
-        (if (= 0 (kk-3- &st &s (Hydro.raw &p2) &kp))
-          (Maybe.Just (Pair.init (tx &s) (rx &s)))
-          (Maybe.Nothing))))
+  (defn kk-3 [st p2 kp]
+    (let [s (session-keypair)]
+      (if (= 0 (kk-3- &st &s (Hydro.raw &p2) &kp))
+        (Maybe.Just (Pair.init (tx &s) (rx &s)))
+        (Maybe.Nothing))))
 
-    (private xx-1-)
-    (hidden xx-1-)
-    (register xx-1-
-              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte)]
-                  Int)
-              "hydro_kx_xx_1")
-    (doc xx-1 "s called by a client initiating a connection. It initializes the
+  (private xx-1-)
+  (hidden xx-1-)
+  (register xx-1- (Fn [&HydroKXState (Ptr Byte) (Ptr Byte)] Int) "hydro_kx_xx_1")
+  (doc xx-1 "s called by a client initiating a connection. It initializes the
 state, computes an ephemeral key pair, and creates the first packet to send to
 the server.
 
 If all goes well, it returns a pair of (`state`, `packet1`).")
-    (defn xx-1 []
-      (let [st (state)
-            b (Array.allocate x-packet1-bytes)]
+  (defn xx-1 []
+    (let [st (state)
+          b (Array.allocate x-packet1-bytes)]
       (if (= 0 (xx-1- &st (Hydro.raw &b) NULL))
         (Maybe.Just (Pair.init st b))
         (Maybe.Nothing))))
 
-    (private xx-2-)
-    (hidden xx-2-)
-    (register xx-2-
-              (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) (Ptr Byte)
-                   &HydroKXKeyPair] Int)
-              "hydro_kx_xx_2")
-    (doc xx-2 "has to be called by the server after a client request has been
+  (private xx-2-)
+  (hidden xx-2-)
+  (register xx-2-
+    (Fn [&HydroKXState (Ptr Byte) (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
+    "hydro_kx_xx_2")
+  (doc xx-2 "has to be called by the server after a client request has been
 received. It validates the request, and creates the packet to send to the
 client.
 
 If all goes well, it returns (`state`, `packet2`).")
-    (defn xx-2 [skp p]
-      (let [st (state)
-            b (Array.allocate x-packet2-bytes)]
+  (defn xx-2 [skp p]
+    (let [st (state)
+          b (Array.allocate x-packet2-bytes)]
       (if (= 0 (xx-2- &st (Hydro.raw &b) (Hydro.raw &p) NULL &skp))
         (Maybe.Just (Pair.init st b))
         (Maybe.Nothing))))
 
-    (private xx-3-)
-    (hidden xx-3-)
-    (register xx-3-
-              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte)
-                   (Ptr Byte) (Ptr Byte) &HydroKXKeyPair] Int)
-              "hydro_kx_xx_3")
-    (doc xx-3 "has to be called by the client after having received the packet
+  (private xx-3-)
+  (hidden xx-3-)
+  (register xx-3-
+    (Fn
+      [
+        &HydroKXState
+        &HydroKXSessionKeyPair
+        (Ptr Byte)
+        (Ptr Byte)
+        (Ptr Byte)
+        (Ptr Byte)
+        &HydroKXKeyPair]
+      Int)
+    "hydro_kx_xx_3")
+  (doc xx-3 "has to be called by the client after having received the packet
 from the server. It validates the packet, creates another packet for the
 server, and computes the shared session key.
 
 If all goes well, it returns [`packet3`, `tx`, `rx`].")
-    (defn xx-3 [st p2 kp]
-      (let [s (session-keypair)
-            b (Array.allocate x-packet3-bytes)]
-        (if (= 0 (xx-3- &st &s (Hydro.raw &b) NULL (Hydro.raw &p2) NULL &kp))
-          (Maybe.Just [b (tx &s) (rx &s)])
-          (Maybe.Nothing))))
+  (defn xx-3 [st p2 kp]
+    (let [s (session-keypair)
+          b (Array.allocate x-packet3-bytes)]
+      (if (= 0 (xx-3- &st &s (Hydro.raw &b) NULL (Hydro.raw &p2) NULL &kp))
+        (Maybe.Just [b (tx &s) (rx &s)])
+        (Maybe.Nothing))))
 
-    (private xx-4-)
-    (hidden xx-4-)
-    (register xx-4-
-              (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte)
-                   (Ptr Byte)] Int)
-              "hydro_kx_xx_4")
-    (doc xx-4 "has to be called by the server after having received the final
+  (private xx-4-)
+  (hidden xx-4-)
+  (register xx-4-
+    (Fn
+      [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)]
+      Int)
+    "hydro_kx_xx_4")
+  (doc xx-4 "has to be called by the server after having received the final
 packet from the client. It validates the packet, and computes the shared
 session key.
 
 If all goes well, it returns a pair of (`tx`, `rx`).")
-    (defn xx-4 [st p3]
-      (let [s (session-keypair)]
-        (if (= 0 (xx-4- &st &s NULL (Hydro.raw &p3) NULL))
-          (Maybe.Just (Pair.init (tx &s) (rx &s)))
-          (Maybe.Nothing))))
-)
+  (defn xx-4 [st p3]
+    (let [s (session-keypair)]
+      (if (= 0 (xx-4- &st &s NULL (Hydro.raw &p3) NULL))
+        (Maybe.Just (Pair.init (tx &s) (rx &s)))
+        (Maybe.Nothing)))))

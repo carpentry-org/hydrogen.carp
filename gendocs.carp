@@ -26,7 +26,12 @@ encouraged for additional context.
 ")
 
 (save-docs
-  Hydro HydroRandom HydroHash HydroKDF HydroSecretBox HydroSign HydroPWHash
-  HydroKX
-)
+  Hydro
+  HydroRandom
+  HydroHash
+  HydroKDF
+  HydroSecretBox
+  HydroSign
+  HydroPWHash
+  HydroKX)
 (quit)
