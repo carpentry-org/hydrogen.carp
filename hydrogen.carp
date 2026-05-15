@@ -1,8 +1,8 @@
 (relative-include "./hydrogenbuf.h")
 
-(add-cflag
-  (Dynamic.String.concat
-    [(Dynamic.Path.directory (file)) "/libhydrogen/hydrogen.c"]))
+(add-cflag (Dynamic.String.concat [
+               (Dynamic.Path.directory (file))
+               "/libhydrogen/hydrogen.c"]))
 
 (doc Hydro "The base hydrogen module. It includes functions for creating and
 handling hydrogen buffers.")
@@ -38,9 +38,8 @@ handling hydrogen buffers.")
 same reference will lead to a failed comparison, as per the [hydrogen
 specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-for-equality).")
   (defn = [a b]
-    (and
-      (= (Array.length a) (Array.length b))
-      (eq- (raw a) (raw b) (Array.length a))))
+    (and (= (Array.length a) (Array.length b))
+         (eq- (raw a) (raw b) (Array.length a))))
 
   (doc context "creates a context from a string.")
   (defn context [s] (do (assert (= (length s) 8)) (cstr s))))
@@ -163,15 +162,13 @@ final hash.")
   (doc gen "hashes a string `msg`, using a context `ctx` and a key `key`.")
   (defn gen [msg ctx key]
     (let [hash (Array.allocate bytes)]
-      (if (=
-          0
-          (gen-
-            (Hydro.raw &hash)
-            (Array.length &hash)
-            (Hydro.raw msg)
-            (Array.length msg)
-            ctx
-            (Hydro.raw key)))
+      (if (= 0
+             (gen- (Hydro.raw &hash)
+                   (Array.length &hash)
+                   (Hydro.raw msg)
+                   (Array.length msg)
+                   ctx
+                   (Hydro.raw key)))
         (Maybe.Just hash)
         (Maybe.Nothing)))))
 
@@ -218,14 +215,12 @@ Example:
 using the context `ctx` and the master key `key`.")
   (defn derive-from-key [subkey-len id ctx key]
     (let [sub (Array.allocate subkey-len)]
-      (if (=
-          0
-          (derive-from-key-
-            (Hydro.raw &sub)
-            (Array.length &sub)
-            id
-            ctx
-            (Hydro.raw key)))
+      (if (= 0
+             (derive-from-key- (Hydro.raw &sub)
+               (Array.length &sub)
+               id
+               ctx
+               (Hydro.raw key)))
         (Maybe.Just sub)
         (Maybe.Nothing)))))
 
@@ -277,15 +272,13 @@ Example:
 `ctx` and key `key`.")
   (defn encrypt [m id ctx key]
     (let [c (Array.allocate (+ (Array.length m) header-bytes))]
-      (if (=
-          0
-          (encrypt-
-            (Hydro.raw &c)
-            (Hydro.raw m)
-            (Array.length m)
-            id
-            ctx
-            (Hydro.raw key)))
+      (if (= 0
+             (encrypt- (Hydro.raw &c)
+               (Hydro.raw m)
+               (Array.length m)
+               id
+               ctx
+               (Hydro.raw key)))
         (Maybe.Just c)
         (Maybe.Nothing))))
 
@@ -298,15 +291,13 @@ Example:
 `ctx` and key `key`.")
   (defn decrypt [c id ctx key]
     (let [m (Array.allocate (- (Array.length c) header-bytes))]
-      (if (=
-          0
-          (decrypt-
-            (Hydro.raw &m)
-            (Hydro.raw c)
-            (Array.length c)
-            id
-            ctx
-            (Hydro.raw key)))
+      (if (= 0
+             (decrypt- (Hydro.raw &m)
+               (Hydro.raw c)
+               (Array.length c)
+               id
+               ctx
+               (Hydro.raw key)))
         (Maybe.Just m)
         (Maybe.Nothing)))))
 
@@ -367,14 +358,12 @@ Example:
 `keypair`.")
   (defn create [msg ctx keypair]
     (let [signature (Array.allocate bytes)]
-      (if (=
-          0
-          (create-
-            (Hydro.raw &signature)
-            (Hydro.raw msg)
-            (Array.length msg)
-            ctx
-            (sk keypair)))
+      (if (= 0
+             (create- (Hydro.raw &signature)
+               (Hydro.raw msg)
+               (Array.length msg)
+               ctx
+               (sk keypair)))
         (Maybe.Just signature)
         (Maybe.Nothing))))
 
@@ -386,14 +375,12 @@ Example:
   (doc verify "verifies a signature `signature` for a message `msg`, using the
 context `ctx` and the keypair `keypair`.")
   (defn verify [signature msg ctx keypair]
-    (=
-      0
-      (verify-
-        (Hydro.raw signature)
-        (Hydro.raw msg)
-        (Array.length msg)
-        ctx
-        (pk keypair))))
+    (= 0
+       (verify- (Hydro.raw signature)
+                (Hydro.raw msg)
+                (Array.length msg)
+                ctx
+                (pk keypair))))
 
   (register-type HydroSignState)
   (doc state "generates a state for multi-part signing.")
@@ -481,16 +468,14 @@ the password `pwd`, using the context `ctx`, the master key `master-key`, and
 the limit of operations `ops-limit`. Only use for testing!")
   (defn hash-deterministic [len pwd ctx master-key ops-limit]
     (let [h (Array.allocate len)]
-      (if (=
-          0
-          (hash-deterministic
-            (Hydro.raw &h)
-            len
-            (cstr pwd)
-            (length pwd)
-            (Hydro.raw ctx)
-            (Hydro.raw master-key)
-            ops-limit))
+      (if (= 0
+             (hash-deterministic (Hydro.raw &h)
+               len
+               (cstr pwd)
+               (length pwd)
+               (Hydro.raw ctx)
+               (Hydro.raw master-key)
+               ops-limit))
         (Maybe.Just h)
         (Maybe.Nothing))))
 
@@ -503,16 +488,14 @@ the limit of operations `ops-limit`. Only use for testing!")
 key `master-key` and a set of parameters.")
   (defn create-with [pwd master-key ops-limit mem-limit threads]
     (let [h (Array.allocate stored-bytes)]
-      (if (=
-          0
-          (create-
-            (Hydro.raw &h)
-            (cstr pwd)
-            (length pwd)
-            (Hydro.raw master-key)
-            ops-limit
-            mem-limit
-            threads))
+      (if (= 0
+             (create- (Hydro.raw &h)
+               (cstr pwd)
+               (length pwd)
+               (Hydro.raw master-key)
+               ops-limit
+               mem-limit
+               threads))
         (Maybe.Just h)
         (Maybe.Nothing))))
   (doc create "generates a hash from the password `pwd`, using the master
@@ -529,16 +512,14 @@ are filled in with the default values.")
   (doc verify-with "verifies a hash for the password `pwd`, using the master
 key `master-key` and a set of parameters.")
   (defn verify-with [hash pwd master-key ops-limit-max mem-limit-max threads-max]
-    (=
-      0
-      (verify-
-        (Hydro.raw &hash)
-        (cstr pwd)
-        (length pwd)
-        (Hydro.raw master-key)
-        ops-limit-max
-        mem-limit-max
-        threads-max)))
+    (= 0
+       (verify- (Hydro.raw &hash)
+                (cstr pwd)
+                (length pwd)
+                (Hydro.raw master-key)
+                ops-limit-max
+                mem-limit-max
+                threads-max)))
   (doc verify "verifies a hash for the password `pwd`, using the master
 key `master-key`. The extra parameters used in [`verify-with`](#verify-with)
 are filled in with the default values.")
@@ -548,19 +529,18 @@ are filled in with the default values.")
   (private derive-static-key-)
   (hidden derive-static-key-)
   (register derive-static-key-
-    (Fn
-      [
-        (Ptr Byte)
-        Int
-        (Ptr Byte)
-        (Ptr CChar)
-        Int
-        (Ptr CChar)
-        (Ptr Byte)
-        Int
-        Int
-        Int]
-      Int)
+    (Fn [
+          (Ptr Byte)
+          Int
+          (Ptr Byte)
+          (Ptr CChar)
+          Int
+          (Ptr CChar)
+          (Ptr Byte)
+          Int
+          Int
+          Int]
+        Int)
     "hydro_pwhash_derive_static_key")
   (doc derive-static-key-with "derives a static key of length `static-key-len`
 for `stored` and `pwd`, using the context `ctx`, the master key `master-key`
@@ -575,19 +555,17 @@ and a set of parameters.")
       mem-limit-max
       threads-max]
     (let [static-key (Array.allocate static-key-len)]
-      (if (=
-          0
-          (derive-static-key-
-            (Hydro.raw &static-key)
-            static-key-len
-            (Hydro.raw stored)
-            (cstr pwd)
-            (length pwd)
-            ctx
-            (Hydro.raw master-key)
-            ops-limit-max
-            mem-limit-max
-            threads-max))
+      (if (= 0
+             (derive-static-key- (Hydro.raw &static-key)
+               static-key-len
+               (Hydro.raw stored)
+               (cstr pwd)
+               (length pwd)
+               ctx
+               (Hydro.raw master-key)
+               ops-limit-max
+               mem-limit-max
+               threads-max))
         (Maybe.Just static-key)
         (Maybe.Nothing))))
   (doc derive-static-key "derives a static key of length `static-key-len`
@@ -596,8 +574,7 @@ for `stored` and `pwd`, using the context `ctx` and the master key
 [`derive-static-key-with`](#derive-static-key-with) are filled in with the
 default values.")
   (defn derive-static-key [static-key-len stored pwd ctx master-key]
-    (derive-static-key-with
-      static-key-len
+    (derive-static-key-with static-key-len
       stored
       pwd
       ctx
@@ -614,12 +591,10 @@ default values.")
   (doc reencrypt "reencrypts `stored` using a new master key `new-master-key`
 from the old master key `old-master-key`.")
   (defn reencrypt [stored old-master-key new-master-key]
-    (if (=
-        0
-        (reencrypt-
-          (Hydro.raw &stored)
-          (Hydro.raw old-master-key)
-          (Hydro.raw new-master-key)))
+    (if (= 0
+           (reencrypt- (Hydro.raw &stored)
+             (Hydro.raw old-master-key)
+             (Hydro.raw new-master-key)))
       (Maybe.Just stored)
       (Maybe.Nothing)))
 
@@ -631,14 +606,12 @@ from the old master key `old-master-key`.")
   (doc upgrade "upgrades `stored` with new parameters, using the master key
 `master-key`.")
   (defn upgrade [stored master-key ops-limit mem-limit threads]
-    (if (=
-        0
-        (upgrade-
-          (Hydro.raw &stored)
-          (Hydro.raw master-key)
-          ops-limit
-          mem-limit
-          threads))
+    (if (= 0
+           (upgrade- (Hydro.raw &stored)
+             (Hydro.raw master-key)
+             ops-limit
+             mem-limit
+             threads))
       (Maybe.Just stored)
       (Maybe.Nothing))))
 
@@ -762,9 +735,8 @@ If all goes well, it returns a pair of (`state`, `packet1`).")
   (private kk-2-)
   (hidden kk-2-)
   (register kk-2-
-    (Fn
-      [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) &HydroKXKeyPair]
-      Int)
+    (Fn [&HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte) &HydroKXKeyPair]
+        Int)
     "hydro_kx_kk_2")
   (doc kk-2 "has to be called by the server after a client request has been
 received. It validates the request, computes an ephemeral key pair and creates
@@ -828,16 +800,15 @@ If all goes well, it returns (`state`, `packet2`).")
   (private xx-3-)
   (hidden xx-3-)
   (register xx-3-
-    (Fn
-      [
-        &HydroKXState
-        &HydroKXSessionKeyPair
-        (Ptr Byte)
-        (Ptr Byte)
-        (Ptr Byte)
-        (Ptr Byte)
-        &HydroKXKeyPair]
-      Int)
+    (Fn [
+          &HydroKXState
+          &HydroKXSessionKeyPair
+          (Ptr Byte)
+          (Ptr Byte)
+          (Ptr Byte)
+          (Ptr Byte)
+          &HydroKXKeyPair]
+        Int)
     "hydro_kx_xx_3")
   (doc xx-3 "has to be called by the client after having received the packet
 from the server. It validates the packet, creates another packet for the
@@ -854,9 +825,8 @@ If all goes well, it returns [`packet3`, `tx`, `rx`].")
   (private xx-4-)
   (hidden xx-4-)
   (register xx-4-
-    (Fn
-      [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)]
-      Int)
+    (Fn [&HydroKXState &HydroKXSessionKeyPair (Ptr Byte) (Ptr Byte) (Ptr Byte)]
+        Int)
     "hydro_kx_xx_4")
   (doc xx-4 "has to be called by the server after having received the final
 packet from the client. It validates the packet, and computes the shared
