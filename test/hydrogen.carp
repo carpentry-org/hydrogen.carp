@@ -1,0 +1,115 @@
+(load "Test.carp")
+(load "../hydrogen.carp")
+
+(use Test)
+
+(def CTX (Hydro.context "TestCtx!"))
+
+(deftest test
+  ; --- Hydro core ---
+  (assert-equal test
+    8
+    (Array.length &(Hydro.buf "12345678"))
+    "buf creates array of correct length")
+  (assert-equal test
+    "hello"
+    &(Hydro.unbuf &(Hydro.buf "hello"))
+    "buf and unbuf round-trip")
+  (assert-true test
+    (not (Hydro.= &(Hydro.buf "abc") &(Hydro.buf "xyz")))
+    "different buffers are not equal")
+  (assert-true test
+    (Hydro.= &(Hydro.buf "same") &(Hydro.buf "same"))
+    "identical buffers are equal")
+
+  ; --- HydroRandom ---
+  (assert-true test (let [_ (HydroRandom.u32)] true) "u32 does not crash")
+  (assert-equal test
+    16
+    (Array.length &(HydroRandom.buf 16))
+    "buf returns array of requested length")
+  (assert-equal test
+    0
+    (Array.length &(HydroRandom.buf 0))
+    "buf with 0 returns empty array")
+  (assert-true test
+    (< (HydroRandom.uniform 10) 10)
+    "uniform returns value below upper bound")
+  (assert-true test
+    (let [seed (Hydro.buf &(String.allocate HydroRandom.seed-bytes \x))
+          a (HydroRandom.buf-deterministic 16 &seed)
+          b (HydroRandom.buf-deterministic 16 &seed)]
+      (Hydro.= &a &b))
+    "buf-deterministic is deterministic")
+
+  ; --- HydroHash ---
+  (assert-true test
+    (Maybe.just?
+      &(HydroHash.gen &(Hydro.buf "test")
+                      (Hydro.context "HashCtx!")
+                      &(HydroHash.keygen)))
+    "gen succeeds with valid inputs")
+  (assert-true test
+    (let [key (HydroHash.keygen)
+          ctx (Hydro.context "HashCtx!")
+          h1 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))
+          h2 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))]
+      (Hydro.= &h1 &h2))
+    "gen is deterministic for same inputs")
+  (assert-true test
+    (let [key (HydroHash.keygen)
+          ctx (Hydro.context "HashCtx!")
+          h1 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))
+          h2 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "other") ctx &key))]
+      (not (Hydro.= &h1 &h2)))
+    "gen produces different hashes for different inputs")
+
+  ; --- HydroSecretBox ---
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          msg (Hydro.buf "secret message")]
+      (Maybe.just? &(HydroSecretBox.encrypt &msg 0 CTX &key)))
+    "encrypt succeeds")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          msg (Hydro.buf "secret message")
+          cipher (Maybe.unsafe-from (HydroSecretBox.encrypt &msg 0 CTX &key))
+          plain (Maybe.unsafe-from (HydroSecretBox.decrypt &cipher 0 CTX &key))]
+      (Hydro.= &msg &plain))
+    "encrypt/decrypt round-trip")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          msg (Hydro.buf "secret message")
+          cipher (Maybe.unsafe-from (HydroSecretBox.encrypt &msg 0 CTX &key))
+          wrong-key (HydroSecretBox.keygen)]
+      (Maybe.nothing? &(HydroSecretBox.decrypt &cipher 0 CTX &wrong-key)))
+    "decrypt with wrong key fails")
+
+  ; --- HydroPWHash ---
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)]
+      (Maybe.just? &(HydroPWHash.create "password" &master-key)))
+    "create succeeds")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)
+          hash (Maybe.unsafe-from (HydroPWHash.create "password" &master-key))]
+      (HydroPWHash.verify hash "password" &master-key))
+    "verify succeeds with correct password")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)
+          hash (Maybe.unsafe-from (HydroPWHash.create "password" &master-key))]
+      (not (HydroPWHash.verify hash "wrong" &master-key)))
+    "verify fails with wrong password")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)]
+      (Maybe.just?
+        &(HydroPWHash.hash-deterministic 32 "password" CTX &master-key 100)))
+    "hash-deterministic succeeds (no infinite recursion)")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)
+          h1 (Maybe.unsafe-from
+            (HydroPWHash.hash-deterministic 32 "password" CTX &master-key 100))
+          h2 (Maybe.unsafe-from
+            (HydroPWHash.hash-deterministic 32 "password" CTX &master-key 100))]
+      (Hydro.= &h1 &h2))
+    "hash-deterministic is deterministic"))

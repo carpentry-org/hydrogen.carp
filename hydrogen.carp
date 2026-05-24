@@ -461,7 +461,7 @@ the slower the operation.")
   (private hash-deterministic-)
   (hidden hash-deterministic-)
   (register hash-deterministic-
-    (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) HydrobBufRaw Int] Int)
+    (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) (Ptr Byte) Int Int Int] Int)
     "hydro_pwhash_deterministic")
   (doc hash-deterministic "generates a deterministic hash of length `len` from
 the password `pwd`, using the context `ctx`, the master key `master-key`, and
@@ -469,13 +469,15 @@ the limit of operations `ops-limit`. Only use for testing!")
   (defn hash-deterministic [len pwd ctx master-key ops-limit]
     (let [h (Array.allocate len)]
       (if (= 0
-             (hash-deterministic (Hydro.raw &h)
-                                 len
-                                 (cstr pwd)
-                                 (length pwd)
-                                 (Hydro.raw ctx)
-                                 (Hydro.raw master-key)
-                                 ops-limit))
+             (hash-deterministic- (Hydro.raw &h)
+                                  len
+                                  (cstr pwd)
+                                  (length pwd)
+                                  ctx
+                                  (Hydro.raw master-key)
+                                  ops-limit
+                                  mem-limit
+                                  threads))
         (Maybe.Just h)
         (Maybe.Nothing))))
 
