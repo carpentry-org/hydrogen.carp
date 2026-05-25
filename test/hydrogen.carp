@@ -85,6 +85,79 @@
       (Maybe.nothing? &(HydroSecretBox.decrypt &cipher 0 CTX &wrong-key)))
     "decrypt with wrong key fails")
 
+  ; --- HydroKDF ---
+  (assert-true test
+    (Maybe.just? &(HydroKDF.derive-from-key 32 1 CTX &(HydroKDF.keygen)))
+    "derive-from-key succeeds with valid inputs")
+  (assert-true test
+    (let [key (HydroKDF.keygen)
+          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))
+          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))]
+      (Hydro.= &s1 &s2))
+    "derive-from-key is deterministic for same inputs")
+  (assert-true test
+    (let [key (HydroKDF.keygen)
+          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))
+          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 2 CTX &key))]
+      (not (Hydro.= &s1 &s2)))
+    "derive-from-key with different IDs produces different subkeys")
+  (assert-true test
+    (let [k1 (HydroKDF.keygen)
+          k2 (HydroKDF.keygen)
+          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &k1))
+          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &k2))]
+      (not (Hydro.= &s1 &s2)))
+    "derive-from-key with different keys produces different subkeys")
+
+  ; --- HydroSign ---
+  (assert-true test
+    (let [kp (HydroSign.keygen)]
+      (Maybe.just? &(HydroSign.create &(Hydro.buf "test") CTX &kp)))
+    "sign create succeeds")
+  (assert-true test
+    (let [kp (HydroSign.keygen)
+          msg (Hydro.buf "test")
+          sig (Maybe.unsafe-from (HydroSign.create &msg CTX &kp))]
+      (HydroSign.verify &sig &msg CTX &kp))
+    "sign verify succeeds with correct signature")
+  (assert-true test
+    (let [kp (HydroSign.keygen)
+          msg (Hydro.buf "test")
+          sig (Maybe.unsafe-from (HydroSign.create &msg CTX &kp))]
+      (not (HydroSign.verify &sig &(Hydro.buf "wrong") CTX &kp)))
+    "sign verify fails with wrong message")
+  (assert-true test
+    (let-do [kp (HydroSign.keygen)
+             s (HydroSign.state)]
+      (ignore (HydroSign.init &s CTX))
+      (ignore (HydroSign.update &s &(Hydro.buf "part1")))
+      (ignore (HydroSign.update &s &(Hydro.buf "part2")))
+      (Maybe.just? &(HydroSign.final-create &s &kp)))
+    "multi-part sign create succeeds")
+  (assert-true test
+    (let-do [kp (HydroSign.keygen)
+             s (HydroSign.state)]
+      (ignore (HydroSign.init &s CTX))
+      (ignore (HydroSign.update &s &(Hydro.buf "part1")))
+      (ignore (HydroSign.update &s &(Hydro.buf "part2")))
+      (let-do [sig (Maybe.unsafe-from (HydroSign.final-create &s &kp))]
+        (ignore (HydroSign.init &s CTX))
+        (ignore (HydroSign.update &s &(Hydro.buf "part1")))
+        (ignore (HydroSign.update &s &(Hydro.buf "part2")))
+        (HydroSign.final-verify &s sig &kp)))
+    "multi-part sign verify round-trip")
+  (assert-true test
+    (let-do [kp (HydroSign.keygen)
+             s (HydroSign.state)]
+      (ignore (HydroSign.init &s CTX))
+      (ignore (HydroSign.update &s &(Hydro.buf "part1")))
+      (ignore (HydroSign.update &s &(Hydro.buf "part2")))
+      (let-do [sig (Maybe.unsafe-from (HydroSign.final-create &s &kp))]
+        (ignore (HydroSign.init &s CTX))
+        (ignore (HydroSign.update &s &(Hydro.buf "different")))
+        (not (HydroSign.final-verify &s sig &kp))))
+    "multi-part sign verify fails with different message")
+
   ; --- HydroPWHash ---
   (assert-true test
     (let [master-key (HydroPWHash.keygen)]

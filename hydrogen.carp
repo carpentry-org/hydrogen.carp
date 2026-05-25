@@ -371,7 +371,7 @@ Example:
   (hidden verify-)
   (register verify-
     (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
-    "hydro_sign_create")
+    "hydro_sign_verify")
   (doc verify "verifies a signature `signature` for a message `msg`, using the
 context `ctx` and the keypair `keypair`.")
   (defn verify [signature msg ctx keypair]
