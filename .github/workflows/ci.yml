@@ -29,6 +29,12 @@ jobs:
             carp -b "$f"
           done
 
+      - name: Run tests
+        timeout-minutes: 6
+        run: |
+          set -euo pipefail
+          carp -x test/hydrogen.carp
+
       - name: Install angler
         run: |
           set -euo pipefail
