@@ -60,11 +60,12 @@
                     </ul>
                 </div>
             </div>
-            <h1>
-                HydroKDF
-            </h1>
-            <div class="module-description">
-                <p>This module contains functions for key derivation.</p>
+            <div class="module">
+                <h1>
+                    HydroKDF
+                </h1>
+                <div class="module-description">
+                    <p>This module contains functions for key derivation.</p>
 <p>Example:</p>
 <pre><code>(def context (Hydro.context &quot;Examples&quot;))
 
@@ -74,47 +75,48 @@
   (println* &amp;(HydroKDF.derive-from-key 64 3 context &amp;master-key))))
 </code></pre>
 
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#derive-from-key">
-                    <h3 id="derive-from-key">
-                        derive-from-key
-                    </h3>
-                </a>
-                <div class="description">
-                    defn
                 </div>
-                <p class="sig">
-                    (Fn [Int, Int, (Ptr CChar), (Ref (Array Byte) a)] (Maybe (Array Byte)))
-                </p>
-                <pre class="args">
-                    (derive-from-key subkey-len id ctx key)
-                </pre>
-                <p class="doc">
-                    <p>derives a subkey of length <code>subkey-len</code> with the ID <code>id</code>,
+                <div class="binder">
+                    <a class="anchor" href="#derive-from-key">
+                        <h3 id="derive-from-key">
+                            derive-from-key
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [Int, Int, (Ptr CChar), (Ref (Array Byte) a)] (Maybe (Array Byte)))
+                    </p>
+                    <pre class="args">
+                        (derive-from-key subkey-len id ctx key)
+                    </pre>
+                    <p class="doc">
+                        <p>derives a subkey of length <code>subkey-len</code> with the ID <code>id</code>,
 using the context <code>ctx</code> and the master key <code>key</code>.</p>
 
-                </p>
-            </div>
-            <div class="binder">
-                <a class="anchor" href="#keygen">
-                    <h3 id="keygen">
-                        keygen
-                    </h3>
-                </a>
-                <div class="description">
-                    defn
+                    </p>
                 </div>
-                <p class="sig">
-                    (Fn [] (Array Byte))
-                </p>
-                <pre class="args">
-                    (keygen)
-                </pre>
-                <p class="doc">
-                    <p>generates a master key for use in key derivation procedures.</p>
+                <div class="binder">
+                    <a class="anchor" href="#keygen">
+                        <h3 id="keygen">
+                            keygen
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [] (Array Byte))
+                    </p>
+                    <pre class="args">
+                        (keygen)
+                    </pre>
+                    <p class="doc">
+                        <p>generates a master key for use in key derivation procedures.</p>
 
-                </p>
+                    </p>
+                </div>
             </div>
         </div>
     </body>
