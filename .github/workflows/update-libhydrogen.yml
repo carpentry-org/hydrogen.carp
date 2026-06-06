@@ -1,0 +1,91 @@
+name: Update libhydrogen
+
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Re-vendor libhydrogen from upstream
+        run: ./scripts/vendor-libhydrogen.sh
+
+      - name: Detect change
+        id: diff
+        run: |
+          set -euo pipefail
+          # "Updated" means a vendored *file* changed, not just the VENDORED pin.
+          if [ -z "$(git status --porcelain -- libhydrogen | grep -v 'libhydrogen/VENDORED' || true)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "libhydrogen already up to date."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- libhydrogen
+          fi
+
+      - name: Setup Carp
+        if: steps.diff.outputs.changed == 'true'
+        uses: carpentry-org/setup-carp@v1
+
+      - name: Verify updated libhydrogen
+        if: steps.diff.outputs.changed == 'true'
+        id: verify
+        continue-on-error: true
+        timeout-minutes: 6
+        run: |
+          set -euo pipefail
+          carp -b hydrogen.carp
+          carp -x test/hydrogen.carp
+
+      - name: Open or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHA=$(sed -n 's/^commit: *//p' libhydrogen/VENDORED)
+          SHORT=${SHA:0:12}
+          BRANCH="auto/update-libhydrogen"
+
+          if [ "${{ steps.verify.outcome }}" = "success" ]; then
+            STATUS="✅ Verified in this job: \`carp -b hydrogen.carp\` and \`carp -x test/hydrogen.carp\` both pass."
+          else
+            STATUS="⚠️ Verification FAILED in the update job (likely an upstream API change). Do not merge without a manual fix."
+          fi
+
+          BODY=$(cat <<EOF
+          Automated weekly re-vendor of libhydrogen via \`scripts/vendor-libhydrogen.sh\`.
+
+          Pinned to upstream \`jedisct1/libhydrogen@$SHA\`.
+
+          $STATUS
+
+          Note: PRs opened by the Actions token do not trigger \`ci.yml\`, which is
+          why verification runs inline in the update job above.
+          EOF
+          )
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add libhydrogen
+          git commit -m "chore(libhydrogen): update vendored upstream to $SHORT"
+          git push --force origin "$BRANCH"
+
+          if gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            gh pr edit "$BRANCH" \
+              --title "chore(libhydrogen): update vendored upstream to $SHORT" \
+              --body "$BODY"
+          else
+            gh pr create --base master --head "$BRANCH" \
+              --title "chore(libhydrogen): update vendored upstream to $SHORT" \
+              --body "$BODY"
+          fi
