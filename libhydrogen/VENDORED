@@ -1,0 +1,8 @@
+upstream: https://github.com/jedisct1/libhydrogen
+commit:   cf0caca6d811916e0845005cefe3e92ceb0fff14
+date:     2026-05-27T13:59:09+02:00
+
+Only the files required to build the Carp bindings are vendored here
+(hydrogen.h, hydrogen.c, impl/, LICENSE). To update, run:
+
+    scripts/vendor-libhydrogen.sh [git-ref]
