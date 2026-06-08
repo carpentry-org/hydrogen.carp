@@ -17,9 +17,9 @@ hydro_random_init(void)
     hydro_hash_init(&st, ctx, NULL);
 
     while (ebits < 256) {
-        uint32_t r = get_rand_32();
-        hydro_hash_update(&st, (const uint32_t *) &r, sizeof r);
-        ebits += 32;
+        uint64_t r = get_rand_64();
+        hydro_hash_update(&st, (const uint64_t *) &r, sizeof r);
+        ebits += 64;
     }
 
     hydro_hash_final(&st, hydro_random_context.state, sizeof hydro_random_context.state);
