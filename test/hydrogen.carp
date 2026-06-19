@@ -5,8 +5,9 @@
 
 (def CTX (Hydro.context "TestCtx!"))
 
+(defn unwrap-buf [m] (match m (Maybe.Just v) v (Maybe.Nothing) []))
+
 (deftest test
-  ; --- Hydro core ---
   (assert-equal test
     8
     (Array.length &(Hydro.buf "12345678"))
@@ -22,7 +23,6 @@
     (Hydro.= &(Hydro.buf "same") &(Hydro.buf "same"))
     "identical buffers are equal")
 
-  ; --- HydroRandom ---
   (assert-true test (let [_ (HydroRandom.u32)] true) "u32 does not crash")
   (assert-equal test
     16
@@ -42,7 +42,6 @@
       (Hydro.= &a &b))
     "buf-deterministic is deterministic")
 
-  ; --- HydroHash ---
   (assert-true test
     (Maybe.just?
       &(HydroHash.gen &(Hydro.buf "test")
@@ -52,19 +51,18 @@
   (assert-true test
     (let [key (HydroHash.keygen)
           ctx (Hydro.context "HashCtx!")
-          h1 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))
-          h2 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))]
+          h1 (unwrap-buf (HydroHash.gen &(Hydro.buf "test") ctx &key))
+          h2 (unwrap-buf (HydroHash.gen &(Hydro.buf "test") ctx &key))]
       (Hydro.= &h1 &h2))
     "gen is deterministic for same inputs")
   (assert-true test
     (let [key (HydroHash.keygen)
           ctx (Hydro.context "HashCtx!")
-          h1 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "test") ctx &key))
-          h2 (Maybe.unsafe-from (HydroHash.gen &(Hydro.buf "other") ctx &key))]
+          h1 (unwrap-buf (HydroHash.gen &(Hydro.buf "test") ctx &key))
+          h2 (unwrap-buf (HydroHash.gen &(Hydro.buf "other") ctx &key))]
       (not (Hydro.= &h1 &h2)))
     "gen produces different hashes for different inputs")
 
-  ; --- HydroSecretBox ---
   (assert-true test
     (let [key (HydroSecretBox.keygen)
           msg (Hydro.buf "secret message")]
@@ -73,43 +71,41 @@
   (assert-true test
     (let [key (HydroSecretBox.keygen)
           msg (Hydro.buf "secret message")
-          cipher (Maybe.unsafe-from (HydroSecretBox.encrypt &msg 0 CTX &key))
-          plain (Maybe.unsafe-from (HydroSecretBox.decrypt &cipher 0 CTX &key))]
+          cipher (unwrap-buf (HydroSecretBox.encrypt &msg 0 CTX &key))
+          plain (unwrap-buf (HydroSecretBox.decrypt &cipher 0 CTX &key))]
       (Hydro.= &msg &plain))
     "encrypt/decrypt round-trip")
   (assert-true test
     (let [key (HydroSecretBox.keygen)
           msg (Hydro.buf "secret message")
-          cipher (Maybe.unsafe-from (HydroSecretBox.encrypt &msg 0 CTX &key))
+          cipher (unwrap-buf (HydroSecretBox.encrypt &msg 0 CTX &key))
           wrong-key (HydroSecretBox.keygen)]
       (Maybe.nothing? &(HydroSecretBox.decrypt &cipher 0 CTX &wrong-key)))
     "decrypt with wrong key fails")
 
-  ; --- HydroKDF ---
   (assert-true test
     (Maybe.just? &(HydroKDF.derive-from-key 32 1 CTX &(HydroKDF.keygen)))
     "derive-from-key succeeds with valid inputs")
   (assert-true test
     (let [key (HydroKDF.keygen)
-          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))
-          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))]
+          s1 (unwrap-buf (HydroKDF.derive-from-key 32 1 CTX &key))
+          s2 (unwrap-buf (HydroKDF.derive-from-key 32 1 CTX &key))]
       (Hydro.= &s1 &s2))
     "derive-from-key is deterministic for same inputs")
   (assert-true test
     (let [key (HydroKDF.keygen)
-          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &key))
-          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 2 CTX &key))]
+          s1 (unwrap-buf (HydroKDF.derive-from-key 32 1 CTX &key))
+          s2 (unwrap-buf (HydroKDF.derive-from-key 32 2 CTX &key))]
       (not (Hydro.= &s1 &s2)))
     "derive-from-key with different IDs produces different subkeys")
   (assert-true test
     (let [k1 (HydroKDF.keygen)
           k2 (HydroKDF.keygen)
-          s1 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &k1))
-          s2 (Maybe.unsafe-from (HydroKDF.derive-from-key 32 1 CTX &k2))]
+          s1 (unwrap-buf (HydroKDF.derive-from-key 32 1 CTX &k1))
+          s2 (unwrap-buf (HydroKDF.derive-from-key 32 1 CTX &k2))]
       (not (Hydro.= &s1 &s2)))
     "derive-from-key with different keys produces different subkeys")
 
-  ; --- HydroSign ---
   (assert-true test
     (let [kp (HydroSign.keygen)]
       (Maybe.just? &(HydroSign.create &(Hydro.buf "test") CTX &kp)))
@@ -117,13 +113,13 @@
   (assert-true test
     (let [kp (HydroSign.keygen)
           msg (Hydro.buf "test")
-          sig (Maybe.unsafe-from (HydroSign.create &msg CTX &kp))]
+          sig (unwrap-buf (HydroSign.create &msg CTX &kp))]
       (HydroSign.verify &sig &msg CTX &kp))
     "sign verify succeeds with correct signature")
   (assert-true test
     (let [kp (HydroSign.keygen)
           msg (Hydro.buf "test")
-          sig (Maybe.unsafe-from (HydroSign.create &msg CTX &kp))]
+          sig (unwrap-buf (HydroSign.create &msg CTX &kp))]
       (not (HydroSign.verify &sig &(Hydro.buf "wrong") CTX &kp)))
     "sign verify fails with wrong message")
   (assert-true test
@@ -140,7 +136,7 @@
       (ignore (HydroSign.init &s CTX))
       (ignore (HydroSign.update &s &(Hydro.buf "part1")))
       (ignore (HydroSign.update &s &(Hydro.buf "part2")))
-      (let-do [sig (Maybe.unsafe-from (HydroSign.final-create &s &kp))]
+      (let-do [sig (unwrap-buf (HydroSign.final-create &s &kp))]
         (ignore (HydroSign.init &s CTX))
         (ignore (HydroSign.update &s &(Hydro.buf "part1")))
         (ignore (HydroSign.update &s &(Hydro.buf "part2")))
@@ -152,25 +148,24 @@
       (ignore (HydroSign.init &s CTX))
       (ignore (HydroSign.update &s &(Hydro.buf "part1")))
       (ignore (HydroSign.update &s &(Hydro.buf "part2")))
-      (let-do [sig (Maybe.unsafe-from (HydroSign.final-create &s &kp))]
+      (let-do [sig (unwrap-buf (HydroSign.final-create &s &kp))]
         (ignore (HydroSign.init &s CTX))
         (ignore (HydroSign.update &s &(Hydro.buf "different")))
         (not (HydroSign.final-verify &s sig &kp))))
     "multi-part sign verify fails with different message")
 
-  ; --- HydroPWHash ---
   (assert-true test
     (let [master-key (HydroPWHash.keygen)]
       (Maybe.just? &(HydroPWHash.create "password" &master-key)))
     "create succeeds")
   (assert-true test
     (let [master-key (HydroPWHash.keygen)
-          hash (Maybe.unsafe-from (HydroPWHash.create "password" &master-key))]
+          hash (unwrap-buf (HydroPWHash.create "password" &master-key))]
       (HydroPWHash.verify hash "password" &master-key))
     "verify succeeds with correct password")
   (assert-true test
     (let [master-key (HydroPWHash.keygen)
-          hash (Maybe.unsafe-from (HydroPWHash.create "password" &master-key))]
+          hash (unwrap-buf (HydroPWHash.create "password" &master-key))]
       (not (HydroPWHash.verify hash "wrong" &master-key)))
     "verify fails with wrong password")
   (assert-true test
@@ -180,9 +175,9 @@
     "hash-deterministic succeeds (no infinite recursion)")
   (assert-true test
     (let [master-key (HydroPWHash.keygen)
-          h1 (Maybe.unsafe-from
+          h1 (unwrap-buf
             (HydroPWHash.hash-deterministic 32 "password" CTX &master-key 100))
-          h2 (Maybe.unsafe-from
+          h2 (unwrap-buf
             (HydroPWHash.hash-deterministic 32 "password" CTX &master-key 100))]
       (Hydro.= &h1 &h2))
     "hash-deterministic is deterministic"))
