@@ -23,6 +23,59 @@
     (Hydro.= &(Hydro.buf "same") &(Hydro.buf "same"))
     "identical buffers are equal")
 
+  (assert-equal test
+    "4142"
+    &(Hydro.to-hex &(Hydro.buf "AB"))
+    "to-hex renders lowercase hex digit pairs")
+  (assert-equal test
+    64
+    (String.length &(Hydro.to-hex &(HydroSecretBox.keygen)))
+    "to-hex renders two characters per byte")
+  (assert-equal test
+    ""
+    &(Hydro.to-hex &[])
+    "to-hex of an empty array is the empty string")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)]
+      (Hydro.= &key &(unwrap-buf (Hydro.from-hex &(Hydro.to-hex &key)))))
+    "hex round-trips a key")
+  (assert-true test
+    (let [hash (unwrap-buf
+            (HydroHash.gen &(Hydro.buf "test")
+                           (Hydro.context "HashCtx!")
+                           &(HydroHash.keygen)))]
+      (Hydro.= &hash &(unwrap-buf (Hydro.from-hex &(Hydro.to-hex &hash)))))
+    "hex round-trips a hash")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))]
+      (Hydro.= &cipher &(unwrap-buf (Hydro.from-hex &(Hydro.to-hex &cipher)))))
+    "hex round-trips a ciphertext")
+  (assert-true test
+    (Hydro.= &(Hydro.buf "JK") &(unwrap-buf (Hydro.from-hex "4a4B")))
+    "from-hex accepts upper- and lowercase digits")
+  (assert-true test
+    (match (Hydro.from-hex "")
+      (Maybe.Just v) (= 0 (Array.length &v))
+      (Maybe.Nothing) false)
+    "from-hex of the empty string is the empty array")
+  (assert-true test
+    (Maybe.nothing? &(Hydro.from-hex "abc"))
+    "from-hex rejects odd-length input")
+  (assert-true test
+    (Maybe.nothing? &(Hydro.from-hex "a"))
+    "from-hex rejects a lone hex digit")
+  (assert-true test
+    (Maybe.nothing? &(Hydro.from-hex "zz"))
+    "from-hex rejects non-hex characters")
+  (assert-true test
+    (Maybe.nothing? &(Hydro.from-hex "41zz"))
+    "from-hex rejects trailing garbage")
+  (assert-true test
+    (Maybe.nothing? &(Hydro.from-hex "41 42"))
+    "from-hex rejects separators")
+
   (assert-true test (let [_ (HydroRandom.u32)] true) "u32 does not crash")
   (assert-equal test
     16
@@ -82,6 +135,57 @@
           wrong-key (HydroSecretBox.keygen)]
       (Maybe.nothing? &(HydroSecretBox.decrypt &cipher 0 CTX &wrong-key)))
     "decrypt with wrong key fails")
+
+  (assert-equal test
+    16
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "m") 0 CTX &key))]
+      (Array.length &(HydroSecretBox.probe &cipher CTX &key)))
+    "probe has the length of a hydrogen probe")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          msg (Hydro.buf "secret message")
+          cipher (unwrap-buf (HydroSecretBox.encrypt &msg 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)]
+      (HydroSecretBox.probe-verify &p &cipher CTX &key))
+    "probe-verify succeeds for the cipher the probe was made for")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          msg (Hydro.buf "secret message")
+          cipher (unwrap-buf (HydroSecretBox.encrypt &msg 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)
+          tag-end (dec (- (Array.length &cipher) (Array.length &msg)))
+          tampered (Array.aset @&cipher
+                               tag-end
+                               (Byte.bit-xor @(Array.unsafe-nth &cipher tag-end)
+                                             (Byte.from-int 1)))]
+      (not (HydroSecretBox.probe-verify &p &tampered CTX &key)))
+    "probe-verify fails for a cipher whose tag was tampered with")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))
+          other (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "other message") 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)]
+      (not (HydroSecretBox.probe-verify &p &other CTX &key)))
+    "probe-verify fails for a different cipher")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)]
+      (not (HydroSecretBox.probe-verify &p &cipher CTX &(HydroSecretBox.keygen))))
+    "probe-verify fails with a different key")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)]
+      (not
+        (HydroSecretBox.probe-verify &p &cipher (Hydro.context "OtherCt!") &key)))
+    "probe-verify fails with a different context")
 
   (assert-true test
     (Maybe.just? &(HydroKDF.derive-from-key 32 1 CTX &(HydroKDF.keygen)))

@@ -152,6 +152,29 @@ specs</a>.</p>
                     </p>
                 </div>
                 <div class="binder">
+                    <a class="anchor" href="#from-hex">
+                        <h3 id="from-hex">
+                            from-hex
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref String a)] (Maybe (Array Byte)))
+                    </p>
+                    <pre class="args">
+                        (from-hex s)
+                    </pre>
+                    <p class="doc">
+                        <p>parses a string of hex digit pairs into an <code>(Array Byte)</code>,
+accepting both upper- and lowercase digits. Returns <code>Nothing</code> unless the whole
+string is a sequence of hex digit pairs; separators are not allowed. The empty
+string yields an empty array.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
                     <a class="anchor" href="#raw">
                         <h3 id="raw">
                             raw
@@ -168,6 +191,29 @@ specs</a>.</p>
                     </span>
                     <p class="doc">
                         
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#to-hex">
+                        <h3 id="to-hex">
+                            to-hex
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref (Array Byte) a)] String)
+                    </p>
+                    <pre class="args">
+                        (to-hex b)
+                    </pre>
+                    <p class="doc">
+                        <p>renders an <code>(Array Byte)</code> as a string of lowercase hex digit
+pairs, in constant time. This is the counterpart to
+<a href="#from-hex"><code>from-hex</code></a>, and the recommended way of storing or printing keys,
+hashes and ciphertexts.</p>
+
                     </p>
                 </div>
                 <div class="binder">

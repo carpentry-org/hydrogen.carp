@@ -41,6 +41,38 @@ specs](https://github.com/jedisct1/libhydrogen/wiki/Helpers#constant-time-test-f
     (and (= (Array.length a) (Array.length b))
          (eq- (raw a) (raw b) (Array.length a))))
 
+  (private bin2hex-)
+  (hidden bin2hex-)
+  (register bin2hex-
+    (Fn [(Ptr CChar) Int (Ptr Byte) Int] (Ptr CChar))
+    "hydro_bin2hex")
+  (doc to-hex "renders an `(Array Byte)` as a string of lowercase hex digit
+pairs, in constant time. This is the counterpart to
+[`from-hex`](#from-hex), and the recommended way of storing or printing keys,
+hashes and ciphertexts.")
+  (defn to-hex [b]
+    (let-do [len (Array.length b)
+             hex (String.allocate (* 2 len) \0)]
+      (ignore (bin2hex- (cstr &hex) (inc (* 2 len)) (raw b) len))
+      hex))
+
+  (private hex2bin-)
+  (hidden hex2bin-)
+  (register hex2bin-
+    (Fn [(Ptr Byte) Int (Ptr CChar) Int (Ptr CChar) (Ptr CChar)] Int)
+    "hydro_hex2bin")
+  (doc from-hex "parses a string of hex digit pairs into an `(Array Byte)`,
+accepting both upper- and lowercase digits. Returns `Nothing` unless the whole
+string is a sequence of hex digit pairs; separators are not allowed. The empty
+string yields an empty array.")
+  (defn from-hex [s]
+    (let [hex-len (length s)
+          bin-len (/ hex-len 2)
+          b (Array.allocate bin-len)]
+      (if (= bin-len (hex2bin- (raw &b) bin-len (cstr s) hex-len NULL NULL))
+        (Maybe.Just b)
+        (Maybe.Nothing))))
+
   (doc context "creates a context from a string.")
   (defn context [s] (do (assert (= (length s) 8)) (cstr s))))
 
@@ -226,8 +258,10 @@ using the context `ctx` and the master key `key`.")
 
 (doc HydroSecretBox
   "This module contains functions for encryption and decryption.
-[Probing](https://github.com/jedisct1/libhydrogen/wiki/Secret-key-encryption#probes)
-is not yet supported.
+[Probes](https://github.com/jedisct1/libhydrogen/wiki/Secret-key-encryption#probes)
+are short authentication tags that let a recipient reject a forged ciphertext
+without having to store or decrypt it; see [`probe`](#probe) and
+[`probe-verify`](#probe-verify).
 
 Example:
 
@@ -299,7 +333,38 @@ Example:
                        ctx
                        (Hydro.raw key)))
         (Maybe.Just m)
-        (Maybe.Nothing)))))
+        (Maybe.Nothing))))
+
+  (private probe-)
+  (hidden probe-)
+  (register probe-
+    (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] ())
+    "hydro_secretbox_probe_create")
+  (doc probe "creates a probe for the cipher `c`, using the context `ctx` and
+key `key`. A probe is bound to the authentication tag of `c`, so a recipient
+can call [`probe-verify`](#probe-verify) to discard forgeries before storing or
+decrypting anything. `c` has to be a cipher produced by
+[`encrypt`](#encrypt); anything shorter than a cipher header aborts.")
+  (defn probe [c ctx key]
+    (let-do [p (Array.allocate probe-bytes)]
+      (probe- (Hydro.raw &p) (Hydro.raw c) (Array.length c) ctx (Hydro.raw key))
+      p))
+
+  (private probe-verify-)
+  (hidden probe-verify-)
+  (register probe-verify-
+    (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
+    "hydro_secretbox_probe_verify")
+  (doc probe-verify "verifies the probe `p` against the cipher `c`, using the
+context `ctx` and key `key`. Returns `false` if `p` was made with a different
+key, context or cipher.")
+  (defn probe-verify [p c ctx key]
+    (= 0
+       (probe-verify- (Hydro.raw p)
+                      (Hydro.raw c)
+                      (Array.length c)
+                      ctx
+                      (Hydro.raw key)))))
 
 (doc HydroSign "This module contains functions for signing data, both single-
 and multi-part.

@@ -26,6 +26,19 @@ If you want to see how to use the library, you can look at the
 [examples/](/examples) directory or look at the [docs
 website](https://veitheller.de/hydrogen/).
 
+Every hydrogen artifact—keys, hashes, ciphertexts and probes—is an `(Array
+Byte)`. To store one in a config file or print it, run it through
+`Hydro.to-hex` and `Hydro.from-hex`:
+
+```clojure
+(let-do [key (HydroSecretBox.keygen)
+         stored (Hydro.to-hex &key)]
+  (println* &stored)
+  (match (Hydro.from-hex &stored)
+    (Maybe.Just k) (assert (Hydro.= &key &k))
+    (Maybe.Nothing) (println* "not valid hex")))
+```
+
 Please note that the key exchange API has not been tested exhaustively and
 could very well be broken. As of now I’d recommend against using it.
 
