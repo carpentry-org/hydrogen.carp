@@ -239,7 +239,9 @@ verify the signature.</p>
                     </pre>
                     <p class="doc">
                         <p>verifies a signature <code>signature</code> for a message <code>msg</code>, using the
-context <code>ctx</code> and the keypair <code>keypair</code>.</p>
+context <code>ctx</code> and the keypair <code>keypair</code>. Returns <code>false</code> if <code>signature</code> is not
+the size <a href="#create"><code>create</code></a> produces, since a signature is by definition
+something someone else handed you.</p>
 
                     </p>
                 </div>

@@ -321,19 +321,22 @@ Example:
   (register decrypt-
     (Fn [(Ptr Byte) (Ptr Byte) Int Int (Ptr CChar) (Ptr Byte)] Int)
     "hydro_secretbox_decrypt")
-  (doc decrypt "encrypts a cipher `c` with the ID `id`, using the context
-`ctx` and key `key`.")
+  (doc decrypt "decrypts a cipher `c` with the ID `id`, using the context
+`ctx` and key `key`. A cipher shorter than a cipher header cannot have come
+from [`encrypt`](#encrypt), and yields `Nothing`.")
   (defn decrypt [c id ctx key]
-    (let [m (Array.allocate (- (Array.length c) header-bytes))]
-      (if (= 0
-             (decrypt- (Hydro.raw &m)
-                       (Hydro.raw c)
-                       (Array.length c)
-                       id
-                       ctx
-                       (Hydro.raw key)))
-        (Maybe.Just m)
-        (Maybe.Nothing))))
+    (if (< (Array.length c) header-bytes)
+      (Maybe.Nothing)
+      (let [m (Array.allocate (- (Array.length c) header-bytes))]
+        (if (= 0
+               (decrypt- (Hydro.raw &m)
+                         (Hydro.raw c)
+                         (Array.length c)
+                         id
+                         ctx
+                         (Hydro.raw key)))
+          (Maybe.Just m)
+          (Maybe.Nothing)))))
 
   (private probe-)
   (hidden probe-)
@@ -357,14 +360,17 @@ decrypting anything. `c` has to be a cipher produced by
     "hydro_secretbox_probe_verify")
   (doc probe-verify "verifies the probe `p` against the cipher `c`, using the
 context `ctx` and key `key`. Returns `false` if `p` was made with a different
-key, context or cipher.")
+key, context or cipher, and also if `p` is not the size [`probe`](#probe)
+produces — a probe usually arrives from somewhere else, so its size is not
+something the recipient gets to assume.")
   (defn probe-verify [p c ctx key]
-    (= 0
-       (probe-verify- (Hydro.raw p)
-                      (Hydro.raw c)
-                      (Array.length c)
-                      ctx
-                      (Hydro.raw key)))))
+    (and (= (Array.length p) probe-bytes)
+         (= 0
+            (probe-verify- (Hydro.raw p)
+                           (Hydro.raw c)
+                           (Array.length c)
+                           ctx
+                           (Hydro.raw key))))))
 
 (doc HydroSign "This module contains functions for signing data, both single-
 and multi-part.
@@ -438,14 +444,17 @@ Example:
     (Fn [(Ptr Byte) (Ptr Byte) Int (Ptr CChar) (Ptr Byte)] Int)
     "hydro_sign_verify")
   (doc verify "verifies a signature `signature` for a message `msg`, using the
-context `ctx` and the keypair `keypair`.")
+context `ctx` and the keypair `keypair`. Returns `false` if `signature` is not
+the size [`create`](#create) produces, since a signature is by definition
+something someone else handed you.")
   (defn verify [signature msg ctx keypair]
-    (= 0
-       (verify- (Hydro.raw signature)
-                (Hydro.raw msg)
-                (Array.length msg)
-                ctx
-                (pk keypair))))
+    (and (= (Array.length signature) bytes)
+         (= 0
+            (verify- (Hydro.raw signature)
+                     (Hydro.raw msg)
+                     (Array.length msg)
+                     ctx
+                     (pk keypair)))))
 
   (register-type HydroSignState)
   (doc state "generates a state for multi-part signing.")
@@ -577,16 +586,19 @@ are filled in with the default values.")
     (Fn [(Ptr Byte) (Ptr CChar) Int (Ptr Byte) Int Int Int] Int)
     "hydro_pwhash_verify")
   (doc verify-with "verifies a hash for the password `pwd`, using the master
-key `master-key` and a set of parameters.")
+key `master-key` and a set of parameters. Returns `false` if `hash` is not the
+size [`create-with`](#create-with) produces, since a stored hash may come back
+from anywhere.")
   (defn verify-with [hash pwd master-key ops-limit-max mem-limit-max threads-max]
-    (= 0
-       (verify- (Hydro.raw &hash)
-                (cstr pwd)
-                (length pwd)
-                (Hydro.raw master-key)
-                ops-limit-max
-                mem-limit-max
-                threads-max)))
+    (and (= (Array.length &hash) stored-bytes)
+         (= 0
+            (verify- (Hydro.raw &hash)
+                     (cstr pwd)
+                     (length pwd)
+                     (Hydro.raw master-key)
+                     ops-limit-max
+                     mem-limit-max
+                     threads-max))))
   (doc verify "verifies a hash for the password `pwd`, using the master
 key `master-key`. The extra parameters used in [`verify-with`](#verify-with)
 are filled in with the default values.")

@@ -348,7 +348,9 @@ are filled in with the default values.</p>
                     </pre>
                     <p class="doc">
                         <p>verifies a hash for the password <code>pwd</code>, using the master
-key <code>master-key</code> and a set of parameters.</p>
+key <code>master-key</code> and a set of parameters. Returns <code>false</code> if <code>hash</code> is not the
+size <a href="#create-with"><code>create-with</code></a> produces, since a stored hash may come back
+from anywhere.</p>
 
                     </p>
                 </div>

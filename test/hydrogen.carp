@@ -186,6 +186,27 @@
       (not
         (HydroSecretBox.probe-verify &p &cipher (Hydro.context "OtherCt!") &key)))
     "probe-verify fails with a different context")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))]
+      (not (HydroSecretBox.probe-verify &(Hydro.buf "a") &cipher CTX &key)))
+    "probe-verify fails for a probe shorter than a probe")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)
+          cipher (unwrap-buf
+            (HydroSecretBox.encrypt &(Hydro.buf "secret message") 0 CTX &key))
+          p (HydroSecretBox.probe &cipher CTX &key)]
+      (not
+        (HydroSecretBox.probe-verify &(Array.push-back @&p (Byte.from-int 0))
+                                     &cipher
+                                     CTX
+                                     &key)))
+    "probe-verify fails for a probe longer than a probe")
+  (assert-true test
+    (let [key (HydroSecretBox.keygen)]
+      (Maybe.nothing? &(HydroSecretBox.decrypt &(Hydro.buf "abc") 0 CTX &key)))
+    "decrypt fails for a cipher shorter than a cipher header")
 
   (assert-true test
     (Maybe.just? &(HydroKDF.derive-from-key 32 1 CTX &(HydroKDF.keygen)))
@@ -226,6 +247,19 @@
           sig (unwrap-buf (HydroSign.create &msg CTX &kp))]
       (not (HydroSign.verify &sig &(Hydro.buf "wrong") CTX &kp)))
     "sign verify fails with wrong message")
+  (assert-true test
+    (let [kp (HydroSign.keygen)
+          msg (Hydro.buf "test")
+          sig (unwrap-buf (HydroSign.create &msg CTX &kp))]
+      (not (HydroSign.verify &(Array.prefix &sig 8) &msg CTX &kp)))
+    "sign verify fails for a truncated signature")
+  (assert-true test
+    (let [kp (HydroSign.keygen)
+          msg (Hydro.buf "test")
+          sig (unwrap-buf (HydroSign.create &msg CTX &kp))]
+      (not
+        (HydroSign.verify &(Array.push-back sig (Byte.from-int 0)) &msg CTX &kp)))
+    "sign verify fails for a signature with trailing bytes")
   (assert-true test
     (let-do [kp (HydroSign.keygen)
              s (HydroSign.state)]
@@ -272,6 +306,19 @@
           hash (unwrap-buf (HydroPWHash.create "password" &master-key))]
       (not (HydroPWHash.verify hash "wrong" &master-key)))
     "verify fails with wrong password")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)
+          hash (unwrap-buf (HydroPWHash.create "password" &master-key))]
+      (not (HydroPWHash.verify (Array.prefix &hash 8) "password" &master-key)))
+    "verify fails for a truncated hash")
+  (assert-true test
+    (let [master-key (HydroPWHash.keygen)
+          hash (unwrap-buf (HydroPWHash.create "password" &master-key))]
+      (not
+        (HydroPWHash.verify (Array.push-back hash (Byte.from-int 0))
+                            "password"
+                            &master-key)))
+    "verify fails for a hash with trailing bytes")
   (assert-true test
     (let [master-key (HydroPWHash.keygen)]
       (Maybe.just?
