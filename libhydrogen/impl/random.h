@@ -17,8 +17,8 @@ static TLS struct {
 #    include "random/nrf52832.h"
 #elif defined(_WIN32)
 #    include "random/windows.h"
-#elif defined(__wasi__)
-#    include "random/wasi.h"
+#elif defined(__wasm__) && !defined(__EMSCRIPTEN__)
+#    include "random/wasm.h"
 #elif defined(__linux__) && defined(__KERNEL__)
 #    include "random/linux_kernel.h"
 #elif defined(__unix__)
@@ -97,8 +97,8 @@ hydro_random_uniform(const uint32_t upper_bound)
     do {
         r = hydro_random_u32();
     } while (r < min);
-    /* r is now clamped to a set whose size mod upper_bound == 0
-     * the worst case (2**31+1) requires 2 attempts on average */
+    /* r is now clamped to a set whose size modulo upper_bound is zero.
+     * The worst case (2**31+1) requires 2 attempts on average. */
 
     return r % upper_bound;
 }

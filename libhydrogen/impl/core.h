@@ -127,6 +127,7 @@ hydro_equal(const void *b1_, const void *b2_, size_t len)
     const uint8_t *b2                   = (const uint8_t *) b2_;
     size_t         i;
     uint8_t        d = (uint8_t) 0U;
+    uint32_t       x;
 
     if (b1 == b2) {
         d = ~d;
@@ -134,25 +135,30 @@ hydro_equal(const void *b1_, const void *b2_, size_t len)
     for (i = 0U; i < len; i++) {
         d |= b1[i] ^ b2[i];
     }
-    return (bool) (1 & ((d - 1) >> 8));
+    x = (uint32_t) d - 1U;
+
+    return (bool) (((x >> 29) ^ hydro_optblocker_u32) >> 2);
 }
 
 int
 hydro_compare(const uint8_t *b1_, const uint8_t *b2_, size_t len)
 {
     const volatile uint8_t *volatile b1 = (const volatile uint8_t *volatile) b1_;
-    const uint8_t *b2                   = (const uint8_t *) b2_;
-    uint8_t        gt                   = 0U;
-    uint8_t        eq                   = 1U;
-    size_t         i;
+    const uint8_t   *b2                 = (const uint8_t *) b2_;
+    volatile uint8_t gt                 = 0U;
+    volatile uint8_t eq                 = 1U;
+    uint16_t         x1, x2;
+    size_t           i;
 
     i = len;
     while (i != 0U) {
         i--;
-        gt |= ((b2[i] - b1[i]) >> 8) & eq;
-        eq &= ((b2[i] ^ b1[i]) - 1) >> 8;
+        x1 = b1[i];
+        x2 = b2[i];
+        gt |= (((unsigned int) x2 - (unsigned int) x1) >> 8) & eq;
+        eq &= (((unsigned int) (x2 ^ x1)) - 1U) >> 8;
     }
-    return (int) (gt + gt + eq) - 1;
+    return (int) (2U * gt + eq) - 1;
 }
 
 int
@@ -191,31 +197,33 @@ hydro_pad(unsigned char *buf, size_t unpadded_buflen, size_t blocksize, size_t m
     return (int) (xpadded_len + 1);
 }
 
+static volatile size_t hydro_optblocker_size;
+
 int
 hydro_unpad(const unsigned char *buf, size_t padded_buflen, size_t blocksize)
 {
     const unsigned char *tail;
-    unsigned char        acc = 0U;
-    unsigned char        c;
-    unsigned char        valid   = 0U;
-    volatile size_t      pad_len = 0U;
+    size_t               acc;
+    size_t               valid   = 0U;
+    size_t               pad_len = 0U;
+    size_t               one;
     size_t               i;
-    size_t               is_barrier;
 
     if (padded_buflen < blocksize || blocksize <= 0U) {
         return -1;
     }
+    acc  = hydro_optblocker_size;
+    one  = 1U ^ acc;
     tail = &buf[padded_buflen - 1U];
 
     for (i = 0U; i < blocksize; i++) {
-        c          = *(tail - i);
-        is_barrier = (((acc - 1U) & (pad_len - 1U) & ((c ^ 0x80) - 1U)) >> 8) & 1U;
-        acc |= c;
-        pad_len |= i & (1U + ~is_barrier);
-        valid |= (unsigned char) is_barrier;
+        acc |= *(tail - i);
+        pad_len += ((acc - 1U) >> 8) & one;
+        valid |= (acc ^ 0x80) - 1U;
     }
-    if (valid == 0) {
+    valid = (valid >> 8) & one;
+    if (valid == 0U) {
         return -1;
     }
-    return (int) (padded_buflen - 1 - pad_len);
+    return (int) (padded_buflen - 1U - pad_len);
 }
